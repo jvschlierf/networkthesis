@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+#LaTeX Files (other than .tex)
+Latex_file/*.pdf
+Latex_file/*.fls
+Latex_file/*.log
+
+
 # Distribution / packaging
 .Python
 build/
