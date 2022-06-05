@@ -58,18 +58,16 @@ def get_posts(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1):
     return df
 
 
-def get_crosspost_parent(df, outfile): 
+def get_crosspost_parent(df, outfile): #find the parents of posts in the observed subreddits using the crosspost_parent_list field
    
     df2 = df[df['crosspost_parent_list'].notna()].reset_index()
     df2 = df2[df2['crosspost_parent_list'].str.len() != 0] #sometimes, this field contains an empty list
 
     df2['t'] = df2['crosspost_parent_list'].apply(lambda x: dict(x[0])) # Pull crosspost_from information from field 'crosspost_parent_list' (which is in a json format)
-    df2['crosspost_parent'] = df2['t'].apply(lambda x: x['subreddit'])  # Using the field has the advantage that we can deal with deleted posts which we could not find using the reddit API.
-    df2['crosspost_parent_id'] = df2['t'].apply(lambda x: x['subreddit_id'])
-    df2['crosspost_parent_subs'] = df2['t'].apply(lambda x: x['subreddit_subscribers'] )
-    df2['crosspost_parent_num'] = df2['t'].apply(lambda x: x['num_crossposts'] )
-
-    df2.to_pickle(f'../../Files/{outfile}_cross_parent_temp.pickle') # save file with 
+    df2['crosspost_from'] = df2['t'].apply(lambda x: x['subreddit'])  # Using the field has the advantage that we can deal with deleted posts which we could not find using the reddit API.
+    df2['crosspost_from_id'] = df2['t'].apply(lambda x: x['subreddit_id'])
+    df2['crosspost_from_subs'] = df2['t'].apply(lambda x: x['subreddit_subscribers'] )
+    df2['crosspost_from_num'] = df2['t'].apply(lambda x: x['num_crossposts'] )
     
     df3 = df2.groupby(['subreddit','subreddit_id','crosspost_from', 'crosspost_from_id']).agg({'subreddit_subscribers': 'mean', 'crosspost_from_subs': 'mean' , 'author' : 'count', 'crosspost_from_num': 'sum'}).reset_index()
     df3.rename(columns = {'author':'count',}, inplace = True)
@@ -83,11 +81,42 @@ def get_crosspost_parent(df, outfile):
     df4.to_pickle(f'../../Files/{outfile}_cross_parent.pickle')
     return df4
 
-def get_crosspost_child(df, outfile):
+def get_crosspost_child(df, outfile): #find the crosspost children of posts from the observed subreddits
     api = PushshiftAPI()
+    df = df[df['num_crossposts'] > 0] # We do this by looking for posts that have been crossposted
+    t = df.groupby(['url']).agg({'num_crossposts': 'sum', 'id':  'max'}).reset_index()
+    urls = list(t['url']) # then collect the url of posts / attached links / pictures
 
-    df2.to_pickle(f'../../Files/{outfile}_cross_child.pickle') # save file to avoid straining the API
-    return df2
+    df = pd.DataFrame(columns=['id', 'url', 'title','subreddit', 'subreddit_id', 'subreddit_subscribers',
+        'num_crossposts', 'crosspost_parent', 'created_utc', 'author'])
+    for i in urls:
+        gen2 = api.search_submissions(
+        url = i , # and search for them using the pushshift api
+        filter=[ 'id', 'url', 'title', 'subreddit', 'subreddit_id', 'subreddit_subscribers',
+            'num_crossposts', 'crosspost_parent', 'created_utc', 'author'],
+        limit = 200) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
+        results2 = list(gen2)
+        temp = pd.DataFrame([thing.d_ for thing in results2])
+        df = pd.concat([df, temp])
+
+    df2 = df[df['num_crossposts'] > 0].reset_index(drop=True) #split into parent posts (number of crossposts > 0 )
+    df3 = df[df['num_crossposts'] == 0].reset_index(drop=True) # and child posts (number of crossposts == 0)
+    df3 = df3[df3['crosspost_parent'].notna()] # Drop all children where field for parent is empty
+    df3['crosspost_parent']  = df3['crosspost_parent'].apply(lambda x: x[3:])
+    df2.drop('crosspost_parent', axis=1, inplace=True)
+    df2 = df2.rename(columns ={'subreddit':'crosspost_parent','subreddit_id': 'crosspost_parent_id', 'subreddit_subscribers': 'crosspost_parent_subs', 'num_crossposts': 'crosspost_parent_num'})
+    df4 = df2.merge(df3, left_on='id', right_on='crosspost_parent', suffixes= ('','_y'))
+    df5 = df4.groupby(['subreddit','subreddit_id','crosspost_parent', 'crosspost_parent_id']).agg({'subreddit_subscribers': 'mean', 'crosspost_parent_subs': 'mean' , 'author' : 'count', 'crosspost_parent_num': 'sum'}).reset_index()
+    df5.rename(columns = {'author':'count',}, inplace = True)
+    df5['crosspost_parent_subs'] = df5['crosspost_parent_subs'].astype(int)
+
+    imp = df5.groupby(['crosspost_from']).agg({'subreddit': 'count', 'count': 'sum'})
+    imp = imp.rename(columns ={'count': 'total'}) 
+    imp.drop(['subreddit'], axis=1, inplace=True)
+    df6 = df.merge(imp, on='crosspost_from', how='left')
+
+    df6.to_pickle(f'../../Files/{outfile}_cross_child.pickle') # save file to avoid straining the API
+    return df6
 
     
 
