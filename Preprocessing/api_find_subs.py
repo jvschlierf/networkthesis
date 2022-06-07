@@ -53,7 +53,6 @@ def get_posts(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1):
         end_epoch = start_epoch + 2678400 #ensuring that end time is one month after start time
         print(f'repeat: {j} pulled {len(temp)} items from {len(subreddits)} subreddits')
     
-    df.to_pickle(f'../../Files/{outfile}_temp.pickle')
     return df
 
 def aggregate(df): #aggregate over the subreddits so that we get a list with subreddit - crosspost from and counts
@@ -82,6 +81,7 @@ def get_crosspost_parent(df, outfile): #find the parents of posts in the observe
     df2['crosspost_parent_subs'] = df2['t'].apply(lambda x: x['subreddit_subscribers'] )
     df2['crosspost_parent_num'] = df2['t'].apply(lambda x: x['num_crossposts'] )
     
+    df2 = df2[(df2['crosspost_parent'].str.startswith('u_') == False) & (df2['subreddit'].str.startswith('u_') == False)] # get rid off users as subreddit
     df3 = aggregate(df2)
     print('identified parents')
     df3.to_pickle(f'../../Files/{outfile}_cross_parent.pickle')
@@ -93,14 +93,14 @@ def get_crosspost_child(df, outfile): #find the crosspost children of posts from
     t = df.groupby(['url']).agg({'num_crossposts': 'sum', 'id':  'max'}).reset_index()
     urls = list(t['url']) # then collect the url of posts / attached links / pictures
 
-    df = pd.DataFrame(columns=['id', 'url', 'title','subreddit', 'subreddit_id', 'subreddit_subscribers',
+    df = pd.DataFrame(columns=['id', 'url', 'title', 'subreddit', 'subreddit_id', 'subreddit_subscribers',
         'num_crossposts', 'crosspost_parent', 'created_utc', 'author'])
     for i in urls:
         gen2 = api.search_submissions(
-        url = i , # and search for them using the pushshift api
-        filter=[ 'id', 'url', 'title', 'subreddit', 'subreddit_id', 'subreddit_subscribers',
-            'num_crossposts', 'crosspost_parent', 'created_utc', 'author'],
-        limit = 100) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
+            url = i , # and search for them using the pushshift api
+            filter=[ 'id', 'url', 'title', 'subreddit', 'subreddit_id', 'subreddit_subscribers',
+                'num_crossposts', 'crosspost_parent', 'created_utc', 'author'],
+            limit = 100) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
         results2 = list(gen2)
         temp = pd.DataFrame([thing.d_ for thing in results2])
         df = pd.concat([df, temp])
@@ -114,6 +114,7 @@ def get_crosspost_child(df, outfile): #find the crosspost children of posts from
     df2 = df2.rename(columns ={'subreddit':'crosspost_parent','subreddit_id': 'crosspost_parent_id', 'subreddit_subscribers': 'crosspost_parent_subs', 'num_crossposts': 'crosspost_parent_num'})
     df4 = df2.merge(df3, left_on='id', right_on='crosspost_parent', suffixes= ('','_y'))
 
+    df4 = df4[(df4['crosspost_parent'].str.startswith('u_') == False) & (df4['subreddit'].str.startswith('u_') == False)] # get rid off users as subreddit
     df5 = aggregate(df4)
     
     print('identified children')
@@ -132,6 +133,13 @@ def update_seed_subs(df, subreddits): #find the subreddits to look for in the ne
     print(f'updated subreddit list, new list contains {len(res)} items')
     return res
 
+
+def crosspost_ratio(df):
+    df2 = df.groupby('subreddit').agg({'crosspost_parent': 'count', 'num_crossposts': lambda x: np.count_nonzero(x), 'subreddit_subscribers' : 'count'}).reset_index()
+    df3 = df2.rename(columns ={'subreddit_subscribers':'total', 'num_crossposts': 'crosspost_child'})
+    df3['crosspost_parent_%'] = df3['crosspost_parent'] / df3['total']
+    df3['crosspost_child_%'] = df3['crosspost_child'] / df3['total']
+    return df3
     
 
 def depth(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1, depth_lim=1):
@@ -140,33 +148,40 @@ def depth(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1, dept
     while depth_lim > 1:
         df = get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat)
         print(f'pulled {len(subreddits)} subreddits, number of results: {len(df)}')
+        df.to_pickle(f'../../Files/{outfile}_raw{depth_lim}.pickle')
+        ratio = crosspost_ratio(df)
+        ratio.to_pickle(f'../../Files/{outfile}_ratio_temp{depth_lim}.pickle')
+
         df2 = get_crosspost_parent(df, outfile)
         outdf = outdf.append(df2)
+        
         df3 = get_crosspost_child(df, outfile)
         outdf = outdf.append(df3)
+        
         total_subs.extend(subreddits)
         subreddits = update_seed_subs(outdf, subreddits)
+        
         depth_lim -= 1
         outdf.to_pickle(f'../../Files/{outfile}_cross_temp.pickle')
         print(f'now getting {len(subreddits)} new subreddits, depth is {depth_lim}')
     
+
     outdf.to_pickle(f'../../Files/{outfile}_cross.pickle')
-    
+
     total_subs.extend(subreddits)
     np.savetxt("../../Files/subs.csv", 
            total_subs,
            delimiter =", ", 
            fmt ='% s')
-    # return outdf, total_subs
-    # get list of subreddits_from to then sample from them as well on them as well
+
 
 
 start_epoch = int(dt.datetime(2021, 1, 1).timestamp())
 end_epoch = int(dt.datetime(2021, 2, 1).timestamp())
 
-subreddits = ['DebateVaccines', 'CovidVaccinated', 'Vaccine', 'Coronavirus', 'LockdownSkepticism', 'HermanCainAward', 'NoNewNormal']
+subreddits = ['DebateVaccines', 'Vaccine', 'Coronavirus', 'COVID19',  'LockdownSkepticism', 'NoNewNormal', 'HermanCainAward', 'CovidVaccinated']
 
-depth(start_epoch, end_epoch, subreddits, 'test0606', limit=300, repeat=3, depth_lim=3)
+depth(start_epoch, end_epoch, subreddits, 'test0607', limit=1000, repeat=6, depth_lim=3)
 
 
 # df = pd.read_pickle('../../Files/2021-01-02.pickle')
