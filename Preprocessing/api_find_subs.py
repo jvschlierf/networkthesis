@@ -177,7 +177,7 @@ end_epoch = int(dt.datetime(2021, 2, 1).timestamp())
 
 subreddits = ['DebateVaccines', 'Vaccine', 'Coronavirus', 'COVID19',  'LockdownSkepticism', 'NoNewNormal', 'HermanCainAward', 'CovidVaccinated']
 
-depth(start_epoch, end_epoch, subreddits, 'test0607', limit=1000, repeat=6, depth_lim=3)
+depth(start_epoch, end_epoch, subreddits, 'test0609', limit=2000, repeat=8, depth_lim=3)
 
 
 # df = pd.read_pickle('../../Files/2021-01-02.pickle')
