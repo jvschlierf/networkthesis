@@ -27,22 +27,24 @@ os.chdir(dname)
 
 
 
-def get_posts(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1): # pulls submissions
+def get_posts(start_epoch, end_epoch, subreddits, limit=1000, repeat=1): # pulls submissions
     api = PushshiftAPI()
     df = pd.DataFrame(columns= ['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers', 
                 'crosspost_parent', 'crosspost_parent_list', 'num_crossposts', 'created_utc', 'author'])
     
+    
     for j in range(repeat): #for every subreddit, we pull posts given the set criteria
-        results = api.search_submissions(
-            after = start_epoch,
-            before = end_epoch,
-            subreddit = subreddits,
-            filter=['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers', 
-            'crosspost_parent', 'crosspost_parent_list', 'num_crossposts', 'created_utc', 'author'],
-            limit = limit) #limit to avoid going over the rate limit.
-          
-        temp = pd.DataFrame([thing for thing in results])
-        df = pd.concat([df, temp]) # Add results for one subreddit to the dataframe for all
+        for i in subreddits:
+            results = api.search_submissions(
+                after = start_epoch,
+                before = end_epoch,
+                subreddit = i,
+                filter=['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers', 
+                'crosspost_parent', 'crosspost_parent_list', 'num_crossposts', 'created_utc', 'author'],
+                limit = limit) #limit to avoid going over the rate limit.
+            
+            temp = pd.DataFrame([thing for thing in results])
+            df = pd.concat([df, temp]) # Add results for one subreddit to the dataframe for all
 
     start_epoch = df['created_utc'].tail(1).values[0] # Take last post as start for next repeat
     end_epoch = start_epoch + 2678400 #ensuring that end time is one month after start time
@@ -91,14 +93,15 @@ def get_crosspost_child(df, outfile, depth_lim): #find the crosspost children of
     df = pd.DataFrame(columns=['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
         'num_crossposts', 'crosspost_parent', 'created_utc', 'author'])
 
-    results2 = api.search_submissions(
-        url = urls, # and search for them using the pushshift api
-        filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
-            'num_crossposts', 'crosspost_parent', 'created_utc', 'author'],
-        limit = 100) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
+    for j in urls:
+        results2 = api.search_submissions(
+            url = j, # and search for them using the pushshift api
+            filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
+                'num_crossposts', 'crosspost_parent', 'created_utc', 'author'],
+            limit = 100) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
     
-    temp = pd.DataFrame([thing for thing in results2])
-    df = pd.concat([df, temp])
+        temp = pd.DataFrame([thing for thing in results2])
+        df = pd.concat([df, temp])
 
     df.to_pickle(f'../../Files/{outfile}_raw_child_{depth_lim}.pickle')
     df2 = df[df['num_crossposts'] > 0].reset_index(drop=True) #split into parent posts (number of crossposts > 0 )
