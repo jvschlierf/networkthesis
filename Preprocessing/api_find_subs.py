@@ -145,7 +145,7 @@ def depth(start_epoch, end_epoch, subreddits, outfile, limit=600, repeat=1, dept
     outdf = pd.DataFrame(columns=['subreddit', 'crosspost_parent', 'subreddit_subscribers', 'crosspost_parent_subs', 'count', 'crosspost_parent_num', 'total'])
     total_subs = []
     while depth_lim > 1:
-        df = get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat)
+        df = get_posts(start_epoch, end_epoch, subreddits, limit, repeat)
         print(f'pulled {len(subreddits)} subreddits, number of results: {len(df)}')
         df.to_pickle(f'../../Files/{outfile}_raw{depth_lim}.pickle')
         ratio = crosspost_ratio(df)
@@ -180,7 +180,7 @@ end_epoch = int(dt.datetime(2021, 2, 1).timestamp())
 
 subreddits = ['DebateVaccines', 'Vaccine', 'Coronavirus', 'COVID19',  'LockdownSkepticism', 'NoNewNormal', 'HermanCainAward', 'CovidVaccinated']
 
-depth(start_epoch, end_epoch, subreddits, 'test0609', limit=2000, repeat=8, depth_lim=3)
+depth(start_epoch, end_epoch, subreddits, 'test0609', limit=3000, repeat=8, depth_lim=3)
 
 
 # df = pd.read_pickle('../../Files/2021-01-02.pickle')
