@@ -50,7 +50,7 @@ parser.add_argument('-outfile', type=str, default=outfile, help='outfile name')
 #   - time (start and end)
 
 
-def get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat): # pulls submissions
+def get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat, depth_lim): # pulls submissions
     api = PushshiftAPI(jitter='full')
     df = pd.DataFrame(columns= ['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers', 
                 'crosspost_parent', 'crosspost_parent_list', 'num_crossposts', 'created_utc', 'author', 'num_comments', 'score'])
