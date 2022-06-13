@@ -12,7 +12,6 @@ import logging
 #   - subreddits as initials (maybe als csv?)
 #   - time (start and end)
 
-
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
@@ -32,14 +31,9 @@ end_epoch = int(dt.datetime(2021, 2, 1).timestamp())
 
 subreddits = ['DebateVaccines', 'Vaccine', 'Coronavirus', 'COVID19',  'LockdownSkepticism', 'NoNewNormal', 'HermanCainAward', 'CovidVaccinated']
 
-
 limit = 1000
 repetitions = 8
 depth_lim = 3
-
-logging.info(f'Setup completed, using following parameters:')
-logging.info(f'start: {dt.datetime.fromtimestamp(start_epoch).strftime("%d.%b.%Y %H:%M:%S")}')
-logging.info(f'seed subreddits: {subreddits}, outfile: {outfile}, limit: {limit}, repetitions: {repetitions}, depth_lim: {depth_lim}')
 
 parser = arg.ArgumentParser()
 parser.add_argument('-limit', type=int, metavar='-l', default=limit, help='limit to pull')
@@ -61,7 +55,9 @@ if args.depth_lim:
 if args.outfile:
     outfile = args.outfile
 
-
+logging.info(f'Setup completed, using following parameters:')
+logging.info(f'start: {dt.datetime.fromtimestamp(start_epoch).strftime("%d.%b.%Y %H:%M:%S")}')
+logging.info(f'seed subreddits: {subreddits}, outfile: {outfile}, limit: {limit}, repetitions: {repetitions}, depth_lim: {depth_lim}')
 
 def get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat, depth_lim): # pulls submissions
     api = PushshiftAPI(jitter='full')
@@ -116,7 +112,7 @@ def get_crosspost_parent(df, outfile, depth_lim): #find the parents of posts in 
     
     df2 = df2[(df2['crosspost_parent'].str.startswith('u_') == False) & (df2['subreddit'].str.startswith('u_') == False)] # get rid off users as subreddit
     df3 = aggregate(df2)
-    logging.info('identified parents')
+    logging.info(f'identified {len(df2)} parents')
     df3.to_pickle(f'../../Files/{outfile}_cross_parent_{depth_lim}.pickle')
     return df3
 
@@ -152,7 +148,7 @@ def get_crosspost_child(df, outfile, depth_lim): #find the crosspost children of
     df5 = aggregate(df4)
     
     df
-    logging.info('identified children')
+    logging.info(f'identified {len(df4)} children')
     df5.to_pickle(f'../../Files/{outfile}_cross_child_{depth_lim}.pickle') # save file to avoid straining the API
     return df5
 
