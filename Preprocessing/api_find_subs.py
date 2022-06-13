@@ -20,7 +20,7 @@ os.chdir(dname)
 outfile =  'test_0613'
 
 logging.basicConfig(
-    level=logging.info,
+    level=logging.INFO,
     filename=f'../../Files/logs/api_find_subs{outfile}.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
