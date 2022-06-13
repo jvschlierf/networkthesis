@@ -3,9 +3,15 @@ from pmaw import PushshiftAPI
 import datetime as dt 
 import pandas as pd
 import argparse as arg
-import os
+import os, sys
 import numpy as np
 import logging
+
+# OPEN
+# - Args to influence the following:
+#   - subreddits as initials (maybe als csv?)
+#   - time (start and end)
+
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -14,7 +20,7 @@ os.chdir(dname)
 outfile =  'test_0613'
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.f,
     filename=f'../../Files/logs/api_find_subs{outfile}.log',
     filemode='w',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -35,19 +41,26 @@ logging.info(f'Setup completed, using following parameters:')
 logging.info(f'start: {dt.datetime.fromtimestamp(start_epoch).strftime("%d.%b.%Y %H:%M:%S")}')
 logging.info(f'seed subreddits: {subreddits}, outfile: {outfile}, limit: {limit}, repetitions: {repetitions}, depth_lim: {depth_lim}')
 
-
-
 parser = arg.ArgumentParser()
-parser.add_argument('-limit', type=int, default=limit, help='limit to pull')
-parser.add_argument('-repetitions', type=int, default=repetitions, help='number of repetitions')
+parser.add_argument('-limit', type=int, metavar='-l', default=limit, help='limit to pull')
+parser.add_argument('-repetitions', type=int, metavar='-r', default=repetitions, help='number of repetitions')
 parser.add_argument('-depth_lim', type=int, default=depth_lim, help='depth limit')
 parser.add_argument('-outfile', type=str, default=outfile, help='outfile name')
 
+args = parser.parse_args(sys.argv[1:])
 
-# OPEN
-# - Args to influence the following:
-#   - subreddits as initials (maybe als csv?)
-#   - time (start and end)
+if args.limit:
+    limit = args.limit
+
+if args.repetitions:
+    repetitions = args.repetitions
+
+if args.depth_lim:
+    depth_lim = args.depth_lim
+
+if args.outfile:
+    outfile = args.outfile
+
 
 
 def get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat, depth_lim): # pulls submissions
@@ -202,10 +215,3 @@ def depth(start_epoch=int, end_epoch =int, subreddits = str, outfile = str, limi
 
 depth(start_epoch, end_epoch, subreddits, outfile=outfile, limit=limit, repeat=repetitions, depth_lim=depth_lim)
 
-
-# df = pd.read_pickle('../../Files/2021-01-02.pickle')
-# df2 = aggregate(df)
-
-# df.rename(columns = {'author':'count',}, inplace = True)
-# df3 = importance(df2)
-# df3.to_csv('../../Files/tfidf.csv')
