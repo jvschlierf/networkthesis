@@ -125,15 +125,13 @@ def get_crosspost_child(df, outfile, depth_lim): #find the crosspost children of
     df = pd.DataFrame(columns=['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
         'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score'])
 
-    for j in urls:
-        results2 = api.search_submissions(
-            url = j, # and search for them using the pushshift api
-        filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
-            'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score'],
-        limit = 100) #limit to avoid going over the rate limit. Can be small, since we're specifically only looking for one link and don't expect too high of a number of posts
-    
-        temp = pd.DataFrame([thing for thing in results2])
-        df = pd.concat([df, temp])
+
+    results2 = api.search_submissions(
+        url = urls, # and search for them using the pushshift api
+    filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
+        'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score']) 
+    temp = pd.DataFrame([thing for thing in results2])
+    df = pd.concat([df, temp])
 
     df.to_pickle(f'../../Files/{outfile}_raw_child_{depth_lim}.pickle')
     df2 = df[df['num_crossposts'] > 0].reset_index(drop=True) #split into parent posts (number of crossposts > 0 )
@@ -206,8 +204,6 @@ def depth(start_epoch=int, end_epoch =int, subreddits = str, outfile = str, limi
            fmt ='% s')
 
 
-
-
-
-depth(start_epoch, end_epoch, subreddits, outfile=outfile, limit=limit, repeat=repetitions, depth_lim=depth_lim)
+if __name__ == '__main__':
+    depth(start_epoch, end_epoch, subreddits, outfile=outfile, limit=limit, repeat=repetitions, depth_lim=depth_lim)
 
