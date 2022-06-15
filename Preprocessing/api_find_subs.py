@@ -125,13 +125,13 @@ def get_crosspost_child(df, outfile, depth_lim): #find the crosspost children of
     df = pd.DataFrame(columns=['id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
         'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score'])
 
-
-    results2 = api.search_submissions(
-        url = urls, # and search for them using the pushshift api
-    filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
-        'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score']) 
-    temp = pd.DataFrame([thing for thing in results2])
-    df = pd.concat([df, temp])
+    for j in urls:
+        results2 = api.search_submissions(
+            url = j, # and search for them using the pushshift api
+            filter=[ 'id', 'url', 'title', 'subreddit', 'selftext', 'subreddit_subscribers',
+            'num_crossposts', 'crosspost_parent', 'created_utc', 'author', 'num_comments', 'score']) 
+        temp = pd.DataFrame([thing for thing in results2])
+        df = pd.concat([df, temp])
 
     df.to_pickle(f'../../Files/{outfile}_raw_child_{depth_lim}.pickle')
     df2 = df[df['num_crossposts'] > 0].reset_index(drop=True) #split into parent posts (number of crossposts > 0 )
