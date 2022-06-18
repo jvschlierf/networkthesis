@@ -55,9 +55,7 @@ if args.depth_lim:
 if args.outfile:
     outfile = args.outfile
 
-logging.info(f'Setup completed, using following parameters:')
-logging.info(f'start: {dt.datetime.fromtimestamp(start_epoch).strftime("%d.%b.%Y %H:%M:%S")}')
-logging.info(f'seed subreddits: {subreddits}, outfile: {outfile}, limit: {limit}, repetitions: {repetitions}, depth_lim: {depth_lim}')
+
 
 def get_posts(start_epoch, end_epoch, subreddits, outfile, limit, repeat, depth_lim): # pulls submissions
     api = PushshiftAPI(jitter='full')
@@ -89,6 +87,7 @@ def aggregate(df): #aggregate over the subreddits so that we get a list with sub
     
     df2 = df.groupby(['subreddit','crosspost_parent']).agg({'subreddit_subscribers': 'mean', 'crosspost_parent_subs': 'mean' , 'author' : 'count', 'crosspost_parent_num': 'sum'}).reset_index()
     df2.rename(columns = {'author':'count',}, inplace = True)
+    df2['crosspost_parent_subs'] = df2['crosspost_parent_subs'].fillna(0)
     df2['crosspost_parent_subs'] = df2['crosspost_parent_subs'].astype(int)
 
     imp = df2.groupby(['crosspost_parent']).agg({'subreddit': 'count', 'count': 'sum'})
@@ -190,8 +189,9 @@ def depth(start_epoch=int, end_epoch =int, subreddits = str, outfile = str, limi
         total_subs.extend(subreddits)
         subreddits = update_seed_subs(outdf, subreddits)
         
-        depth_lim -= 1
+
         outdf.to_pickle(f'../../Files/{outfile}_cross_temp_{depth_lim}.pickle')
+        depth_lim -= 1
         logging.info(f'now getting {len(subreddits)} new subreddits, depth is {depth_lim}')
     
 
@@ -205,5 +205,8 @@ def depth(start_epoch=int, end_epoch =int, subreddits = str, outfile = str, limi
 
 
 if __name__ == '__main__':
+    logging.info(f'Setup completed, using following parameters:')
+    logging.info(f'start: {dt.datetime.fromtimestamp(start_epoch).strftime("%d.%b.%Y %H:%M:%S")}')
+    logging.info(f'seed subreddits: {subreddits}, outfile: {outfile}, limit: {limit}, repetitions: {repetitions}, depth_lim: {depth_lim}')
     depth(start_epoch, end_epoch, subreddits, outfile=outfile, limit=limit, repeat=repetitions, depth_lim=depth_lim)
 

@@ -11,7 +11,7 @@ from api_find_subs import get_crosspost_child
 
 
 def main():
-    df = pd.read_pickle('../../Files/test_0613_raw2.pickle')
+    df = pd.read_pickle('/Users/jakobschlierf/Desktop/Master/Thesis/Files/test_0613_raw2.pickle')
     depth_lim = 2
     outfile = 'child_out_0613'
     get_crosspost_child(df, outfile, depth_lim)
