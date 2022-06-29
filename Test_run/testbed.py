@@ -1,22 +1,26 @@
-import os, sys
-import argparse
+import multiprocessing
+import time
 
+def task():
+    print('Sleeping for 5 seconds')
+    time.sleep(5)
+    print('Finished sleeping')
 
+if __name__ == "__main__":
+    start_time = time.perf_counter()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('file', type=str, help='File to run through Pipeline')
-parser.add_argument('-outfile',type=str, metavar='-o',required=False, help="Uncompress to different file name", default=None)
+    # Creates two processes
+    p1 = multiprocessing.Process(target=task)
+    p2 = multiprocessing.Process(target=task)
 
+    # Starts both processes
+    p1.start()
+    p2.start()
 
-args = parser.parse_args(sys.argv[1:])
-outfile = args.file
+    p1.join()
+    p2.join()
 
-if args.outfile:
-    outfile = args.outfile
+    
+    finish_time = time.perf_counter()
 
-os.chdir('../../Files/')
-cl = f'zstd -d {args.file}.zst --memory=2048MB -o {outfile}.txt'
-cl2 = f'bzip2 -z {outfile}.txt'
-os.system(cl)
-os.system(cl2)
-print('Recompression done')
+    print(f"Program finished in {finish_time-start_time} seconds")
