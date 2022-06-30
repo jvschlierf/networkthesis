@@ -3,9 +3,10 @@ import os
 import pandas as pd
 import logging
 import argparse as arg
-import sys
 from multiprocessing import Pool
+import sys
 import datetime
+import csv
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -14,25 +15,17 @@ processes = os.cpu_count() - 2
 
 parser = arg.ArgumentParser()
 parser.add_argument('subreddits', type=str, help='csv list of subreddits to pull')
-parser.add_argument('-start', type=int, help='start date')
-parser.add_argument('-end', type=int, help='end date')
 
 
 args = parser.parse_args(sys.argv[1:])
 
-
-
-# OPEN
-# - Args to influence the following:
-#   - subreddits as initials (maybe als csv?)
-#   - time (start and end)
-#   - number of posts
-#   - from or to crossposts
+start = datetime.datetime(2020, 3, 1)
+end = datetime.datetime(2022, 3, 31)
 
 
 logging.basicConfig(
-    level=logging.info,
-    filename='../../Files/logs/pull_subs.log',
+    level=logging.INFO,
+    filename=f'../../Files/logs/pull_subs{datetime.datetime.today()}.log',
     filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S'
@@ -85,16 +78,20 @@ def pullSubredditComments(subreddit, start, end): # Pulls the comments subreddit
 
 
 def main(subreddit): 
+    subreddit = subreddit[0]
     logging.info('Pulling subreddit: ' + subreddit)
-    start = datetime.datetime(2020, 3, 1)
-    end = datetime.datetime(2022, 3, 31)
+    start = int(datetime.datetime(2020, 3, 1).timestamp())
+    end = int(datetime.datetime(2022, 3, 31).timestamp())
     Subs = pullSubredditSubmissions(subreddit, start, end)
     Comms = pullSubredditComments(subreddit, start, end)
-    Subs.to_pickle(f'../../Files/Submissions/{subreddit}.pickle', index=False)
-    Comms.to_pickle(f'../../Files/Comments/{subreddit}.pickle', index=False)
+    Subs.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
+    Comms.to_pickle(f'../../Files/Comments/{subreddit}.pickle')
 
 
+with open(args.subreddits, newline='') as f:
+    reader = csv.reader(f)
+    subreddits = list(reader)
 
 if __name__ == '__main__':
-    with Pool(os.cpu_count() - 2) as p:
-       p.map(main, subreddit) 
+    with Pool(processes) as p:
+       p.map(main, subreddits) 
