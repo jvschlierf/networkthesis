@@ -79,6 +79,7 @@ def pullSubredditComments(subreddit, start, end): # Pulls the comments subreddit
 
 def main(subreddit): 
     for i in subreddit:
+        i = i[0]
         logging.info('Pulling subreddit: ' + i)
         start = int(datetime.datetime(2020, 3, 1).timestamp())
         end = int(datetime.datetime(2022, 3, 31).timestamp())
