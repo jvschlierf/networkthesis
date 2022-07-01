@@ -1,9 +1,9 @@
 import pmaw
 import os
 import pandas as pd
+# import multiprocessing
 import logging
 import argparse as arg
-from multiprocessing import Pool
 import sys
 import datetime
 import csv
@@ -78,14 +78,14 @@ def pullSubredditComments(subreddit, start, end): # Pulls the comments subreddit
 
 
 def main(subreddit): 
-    subreddit = subreddit[0]
-    logging.info('Pulling subreddit: ' + subreddit)
-    start = int(datetime.datetime(2020, 3, 1).timestamp())
-    end = int(datetime.datetime(2022, 3, 31).timestamp())
-    Subs = pullSubredditSubmissions(subreddit, start, end)
-    Comms = pullSubredditComments(subreddit, start, end)
-    Subs.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
-    Comms.to_pickle(f'../../Files/Comments/{subreddit}.pickle')
+    for i in subreddit:
+        logging.info('Pulling subreddit: ' + i)
+        start = int(datetime.datetime(2020, 3, 1).timestamp())
+        end = int(datetime.datetime(2022, 3, 31).timestamp())
+        Subs = pullSubredditSubmissions(i, start, end)
+        Comms = pullSubredditComments(i, start, end)
+        Subs.to_pickle(f'../../Files/Submissions/{i}.pickle')
+        Comms.to_pickle(f'../../Files/Comments/{i}.pickle')
 
 
 with open(args.subreddits, newline='') as f:
@@ -93,5 +93,4 @@ with open(args.subreddits, newline='') as f:
     subreddits = list(reader)
 
 if __name__ == '__main__':
-    with Pool(processes) as p:
-       p.map(main, subreddits) 
+    main(subreddits) 
