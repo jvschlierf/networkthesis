@@ -29,13 +29,15 @@ logging.basicConfig(
 )
 
 def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and saves it to a file
-    api = pmaw.PushshiftAPI()
+    subreddit = subreddit[0]
+    api = pmaw.PushshiftAPI(jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     results = api.search_submissions(
         subreddit=subreddit, 
         after=start, 
         before=end,
+        mem_safe=True,
         filter = ('author', 
             'title',
             'created_utc',
@@ -53,13 +55,15 @@ def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and sav
     temp.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
 
 def pullSubredditComments(subreddit): # Pulls the comments subreddit from reddit
-    api = pmaw.PushshiftAPI()
+    subreddit = subreddit[0]
+    api = pmaw.PushshiftAPI(jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())  
     results = api.search_comments(
         subreddit=subreddit,
         after=start,
         before=end,
+        mem_safe=True,
         filter = ('author',
             'body',
             'created_utc',
@@ -78,34 +82,15 @@ def main(subreddits, type):
     logging.info(f'start, pulling {type} for {len(subreddits)} subreddits')
     
     if type == 'submissions':
-        processes = [multiprocessing.Process(target=pullSubredditSubmissions, args=[subreddit]) 
-                    for subreddit in subreddits]
+       for subreddit in subreddits:
+           pullSubredditSubmissions(subreddit)
     elif type == 'comments':
-        processes = [multiprocessing.Process(target=pullSubredditComments, args=[subreddit]) 
-                    for subreddit in subreddits]
+            pullSubredditComments(subreddit)
     else:
         raise NameError('Please indicate of action to be done')
         quit()
 
-    # start the processes
-    for process in processes:
-        process.start()
-
-    # wait for completion
-    for process in processes:
-        process.join()
     logging.info('finished')
-
-
-# def main(subreddit): 
-#     subreddit = subreddit[0]
-#     logging.info('Pulling subreddit: ' + subreddit)
-#     Subs = pullSubredditSubmissions(subreddit)
-#     Subs.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
-#     logging.info(f'Pulled subreddit {subreddit} number of posts: {len(Subs)}')
-#     Comms = pullSubredditComments(subreddit, start, end)
-#     Comms.to_pickle(f'../../Files/Comments/{subreddit}.pickle')
-#     logging.info(f'Pulled subreddit {subreddit} number of comments: {len(Comms)}')
 
 
 with open(args.subreddits, newline='') as f:
@@ -114,8 +99,3 @@ with open(args.subreddits, newline='') as f:
 
 if __name__ == '__main__':
    main(subreddits, args.t)
-    # logging.info('start')
-    # p = Pool(processes)
-    # p.map(main, subreddits)
-    # p.close()
-    # logging.info('finished')
