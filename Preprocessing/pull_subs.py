@@ -11,16 +11,13 @@ import csv
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-processes = os.cpu_count() - 2
+processes = 64 
 
 parser = arg.ArgumentParser()
 parser.add_argument('subreddits', type=str, help='csv list of subreddits to pull')
 
 
 args = parser.parse_args(sys.argv[1:])
-
-start = datetime.datetime(2020, 3, 1)
-end = datetime.datetime(2022, 3, 31)
 
 
 logging.basicConfig(
@@ -33,12 +30,13 @@ logging.basicConfig(
 
 def pullSubredditSubmissions(subreddit, start, end): # Pulls a subreddit from reddit and saves it to a file
     api = pmaw.PushshiftAPI(
-    
+    jitter='full'
     )
     results = api.search_submissions(
         subreddit=subreddit, 
         after=start, 
         before=end,
+        mem_safe=True,
         filter = ('author', 
             'title',
             'created_utc',
@@ -56,13 +54,14 @@ def pullSubredditSubmissions(subreddit, start, end): # Pulls a subreddit from re
 
 def pullSubredditComments(subreddit, start, end): # Pulls the comments subreddit from reddit
     api = pmaw.PushshiftAPI(
-
+    jitter='full'
     )
 
     results = api.search_comments(
         subreddit=subreddit,
         after=start,
         before=end,
+        mem_safe=True,
         filter = ('author',
             'body',
             'created_utc',
