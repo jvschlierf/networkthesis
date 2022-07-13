@@ -16,7 +16,7 @@ processes = 64
 
 parser = arg.ArgumentParser()
 parser.add_argument('subreddits', type=str, help='csv list of subreddits to pull')
-parser.add_argument('-t', '--type', type=str, help='type information to pull, either subrmissions or comment')
+parser.add_argument('t', type=str, help='type information to pull, either subrmissions or comment')
 
 args = parser.parse_args(sys.argv[1:])
 
