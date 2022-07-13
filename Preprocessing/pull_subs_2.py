@@ -7,6 +7,7 @@ import multiprocessing
 import sys
 import datetime
 import csv
+from itertools import chain
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -29,7 +30,6 @@ logging.basicConfig(
 )
 
 def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and saves it to a file
-    subreddit = subreddit[0]
     api = pmaw.PushshiftAPI(jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
@@ -55,7 +55,6 @@ def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and sav
     temp.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
 
 def pullSubredditComments(subreddit): # Pulls the comments subreddit from reddit
-    subreddit = subreddit[0]
     api = pmaw.PushshiftAPI(jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())  
@@ -78,13 +77,24 @@ def pullSubredditComments(subreddit): # Pulls the comments subreddit from reddit
     logging.info(f'Pulled subreddit {subreddit} number of comments: {len(temp)}')
     temp.to_pickle(f'../../Files/Comments/{subreddit}.pickle')
 
+def find_existing_pulls(type, subreddits): #remove existing pulls from subreddits list
+    done = os.listdir(f'../../Files/{type}/')
+    for i in done:
+        done[done.index(i)] = i[:-7]
+    res = [i for i in subreddits if i not in done]
+    return res
+
+
 def main(subreddits, type):
-    logging.info(f'start, pulling {type} for {len(subreddits)} subreddits')
-    
-    if type == 'submissions':
+    if type == 'Submissions':
+       subreddits = find_existing_pulls(type, subreddits)
+       logging.info(f'start, pulling {type} for {len(subreddits)} subreddits')
        for subreddit in subreddits:
            pullSubredditSubmissions(subreddit)
-    elif type == 'comments':
+    elif type == 'Comments':
+        subreddits = find_existing_pulls(type, subreddits)
+        logging.info(f'start, pulling {type} for {len(subreddits)} subreddits')
+        for subreddit in subreddits:
             pullSubredditComments(subreddit)
     else:
         raise NameError('Please indicate of action to be done')
@@ -96,6 +106,8 @@ def main(subreddits, type):
 with open(args.subreddits, newline='') as f:
     reader = csv.reader(f)
     subreddits = list(reader)
+
+subreddits = list(chain.from_iterable(subreddits))
 
 if __name__ == '__main__':
    main(subreddits, args.t)
