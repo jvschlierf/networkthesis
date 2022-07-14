@@ -7,6 +7,7 @@ from multiprocessing import Pool
 import sys
 import datetime
 import csv
+from itertools import chain
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -76,14 +77,21 @@ def pullSubredditComments(subreddit, start, end): # Pulls the comments subreddit
     return temp
 
 
+def find_existing_pulls(type, subreddits): #remove existing pulls from subreddits list
+    done = os.listdir(f'../../Files/{type}/')
+    for i in done:
+        done[done.index(i)] = i[:-7]
+    res = [i for i in subreddits if i not in done]
+    return res
+
 def main(subreddit): 
-    subreddit = subreddit[0]
     logging.info('Pulling subreddit: ' + subreddit)
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     # Subs = pullSubredditSubmissions(subreddit, start, end)
     # Subs.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
     # logging.info(f'Pulled subreddit {subreddit} number of posts: {len(Subs)}')
+    
     Comms = pullSubredditComments(subreddit, start, end)
     Comms.to_pickle(f'../../Files/Comments/{subreddit}.pickle')
     logging.info(f'Pulled subreddit {subreddit} number of comments: {len(Comms)}')
@@ -93,8 +101,12 @@ with open(args.subreddits, newline='') as f:
     reader = csv.reader(f)
     subreddits = list(reader)
 
+subreddits = list(chain.from_iterable(subreddits))
+
 if __name__ == '__main__':
     logging.info('start')
+    subreddits = find_existing_pulls('Comments', subreddits)
+    logging.info(f'pulling comments for {len(subreddits)} subreddits')
     p = Pool(processes)
     p.map(main, subreddits)
     p.close()
