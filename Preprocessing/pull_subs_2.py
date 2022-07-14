@@ -30,7 +30,7 @@ logging.basicConfig(
 )
 
 def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and saves it to a file
-    api = pmaw.PushshiftAPI(jitter='full')
+    api = pmaw.PushshiftAPI(num_workers=15, jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     results = api.search_submissions(
@@ -55,7 +55,7 @@ def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and sav
     temp.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
 
 def pullSubredditComments(subreddit): # Pulls the comments subreddit from reddit
-    api = pmaw.PushshiftAPI(jitter='full')
+    api = pmaw.PushshiftAPI(num_workers=15, rate_limit=100, jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())  
     results = api.search_comments(
