@@ -108,10 +108,10 @@ if __name__ == '__main__':
     logging.info('start')
     subreddits = find_existing_pulls('Comments', subreddits)
     logging.info(f'pulling comments for {len(subreddits)} subreddits')
-    p1 = Pool(processes/4, maxtasksperchild=2)
-    p2 = Pool(processes/4, maxtasksperchild=2)
-    p3 = Pool(processes/4, maxtasksperchild=2)
-    p4 = Pool(processes/4, maxtasksperchild=2)
+    p1 = Pool(int(processes/4), maxtasksperchild=2)
+    p2 = Pool(int(processes/4), maxtasksperchild=2)
+    p3 = Pool(int(processes/4), maxtasksperchild=2)
+    p4 = Pool(int(processes/4), maxtasksperchild=2)
     subs_1 = subreddits[0:len(subreddits/4)]
     
     p1.map(main, subs_1)
