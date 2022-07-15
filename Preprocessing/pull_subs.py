@@ -3,13 +3,12 @@ import os
 import pandas as pd
 import logging
 import argparse as arg
-from multiprocessing import Pool, set_start_method
+from multiprocessing import Pool
 import sys
 import datetime
 import csv
 import time
 from itertools import chain
-set_start_method('spawn')
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
