@@ -112,7 +112,7 @@ if __name__ == '__main__':
     p2 = Pool(int(processes/4), maxtasksperchild=2)
     p3 = Pool(int(processes/4), maxtasksperchild=2)
     p4 = Pool(int(processes/4), maxtasksperchild=2)
-    subs_1 = subreddits[0:len(subreddits/4)]
+    subs_1 = subreddits[0:len(subreddits)/4]
     
     p1.map(main, subs_1)
     logging.info(f'started first round of subs with {len(subs_1)}')
