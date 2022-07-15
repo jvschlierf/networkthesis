@@ -117,17 +117,17 @@ if __name__ == '__main__':
     p1.map(main, subs_1)
     logging.info(f'started first round of subs with {len(subs_1)}')
 
-    subs_2 = subreddits[len(subreddits/4):len(subreddits/2)]
+    subs_2 = subreddits[len(subreddits)/4:len(subreddits)/2]
     time.sleep(20)
     p2.map(main, subs_1)
     logging.info(f'started second round of subs with {len(subs_2)}')
 
-    subs_3 = subreddits[len(subreddits/2): len(subreddits/4)*3]
+    subs_3 = subreddits[len(subreddits)/2: (len(subreddits)/4)*3]
     time.sleep(20)
     p3.map(main, subs_3)
     logging.info(f'started third round of subs with {len(subs_3)}')
 
-    subs_4 = subreddits[len(subreddits/4)*3:]
+    subs_4 = subreddits[(len(subreddits)/4)*3:]
     time.sleep(20)
     p4.map(main, subs_4)
     logging.info(f'started third round of subs with {len(subs_4)}')
