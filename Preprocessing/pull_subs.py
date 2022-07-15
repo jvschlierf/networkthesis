@@ -3,11 +3,13 @@ import os
 import pandas as pd
 import logging
 import argparse as arg
-from multiprocessing import Pool
+from multiprocessing import Pool, set_start_method
 import sys
 import datetime
 import csv
+import time
 from itertools import chain
+set_start_method('spawn')
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -107,7 +109,7 @@ if __name__ == '__main__':
     logging.info('start')
     subreddits = find_existing_pulls('Comments', subreddits)
     logging.info(f'pulling comments for {len(subreddits)} subreddits')
-    p = Pool(processes)
+    p = Pool(processes, maxtasksperchild=2)
     p.map(main, subreddits)
     p.close()
     logging.info('finished')
