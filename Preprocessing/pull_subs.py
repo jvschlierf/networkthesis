@@ -134,4 +134,7 @@ if __name__ == '__main__':
     
 
     p1.close()
+    p2.close()
+    p3.close()
+    p4.close()
     logging.info('finished')
