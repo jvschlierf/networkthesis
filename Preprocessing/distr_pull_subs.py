@@ -87,7 +87,7 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     return res
 
 def main(subreddit): 
-    ptype = 'Submissions'
+    ptype = 'Comments'
     t = random.randint(0, 60)
     logging.info(f'Pulling subreddit: {subreddit}, but first sleeping for {t}')
     time.sleep(t)
@@ -118,7 +118,7 @@ subreddits = list(chain.from_iterable(subreddits))
 
 if __name__ == '__main__':
     logging.info('start')
-    subreddits = find_existing_pulls('Submissions', subreddits)
+    subreddits = find_existing_pulls('Comments', subreddits)
     logging.info(f'pulling comments for {len(subreddits)} subreddits')
     p1 = Pool(processes, maxtasksperchild=2)
     
