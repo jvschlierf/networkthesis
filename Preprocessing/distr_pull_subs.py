@@ -89,7 +89,7 @@ def main(subreddit):
     ptype = 'Comments'
     logging.info('Pulling subreddit: ' + subreddit)
     start = int(datetime.datetime(2020, 3, 1).timestamp())
-    end = int(datetime.datetime(2021, 2, 31).timestamp())
+    end = int(datetime.datetime(2021, 2, 28).timestamp())
     y1 = pullSubreddit(subreddit, start, end, ptype)
     if len(y1) == 0:
         logging.warning(f'Failed to pull y1 of Subreddit {subreddit}')
