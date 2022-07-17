@@ -8,12 +8,13 @@ import sys
 import datetime
 import csv
 import time
+import random
 from itertools import chain
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-processes = 64 
+processes = 64
 
 
 parser = arg.ArgumentParser()
@@ -86,27 +87,27 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     return res
 
 def main(subreddit): 
-    ptype = 'Comments'
-    logging.info('Pulling subreddit: ' + subreddit)
+    ptype = 'Submissions'
+    t = random.randint(0, 60)
+    logging.info(f'Pulling subreddit: {subreddit}, but first sleeping for {t}')
+    time.sleep(t)
     start = int(datetime.datetime(2020, 3, 1).timestamp())
     end = int(datetime.datetime(2021, 2, 28).timestamp())
     y1 = pullSubreddit(subreddit, start, end, ptype)
     if len(y1) == 0:
         logging.warning(f'Failed to pull y1 of Subreddit {subreddit}')
-        pass
+        time.sleep(10)
+        return
     start = int(datetime.datetime(2021, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     y2 = pullSubreddit(subreddit, start, end, ptype)
     if len(y2) == 0:
         logging.warning(f'Failed to pull y2 of Subreddit {subreddit}')
-        pass
+        time.sleep(10)
+        return
 
     total = pd.concat([y1,y2], axis=0).reset_index()
     total.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
-
-
-    
-    
 
 
 with open(args.subreddits, newline='') as f:
@@ -117,7 +118,7 @@ subreddits = list(chain.from_iterable(subreddits))
 
 if __name__ == '__main__':
     logging.info('start')
-    subreddits = find_existing_pulls('Comments', subreddits)
+    subreddits = find_existing_pulls('Submissions', subreddits)
     logging.info(f'pulling comments for {len(subreddits)} subreddits')
     p1 = Pool(processes, maxtasksperchild=2)
     
