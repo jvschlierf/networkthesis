@@ -14,7 +14,7 @@ from itertools import chain
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-processes = 64
+processes = 32
 
 
 parser = arg.ArgumentParser()
