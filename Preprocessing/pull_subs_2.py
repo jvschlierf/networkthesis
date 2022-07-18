@@ -32,7 +32,7 @@ logging.basicConfig(
 def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and saves it to a file
     api = pmaw.PushshiftAPI(num_workers=15, jitter='full')
     start = int(datetime.datetime(2020, 3, 1).timestamp())
-    end = int(datetime.datetime(2022, 3, 31).timestamp())
+    end = int(datetime.datetime(2021, 2, 28).timestamp())
     results = api.search_submissions(
         subreddit=subreddit, 
         after=start, 
@@ -50,7 +50,27 @@ def pullSubredditSubmissions(subreddit): # Pulls a subreddit from reddit and sav
             'permalink')
         )
 
-    temp = pd.DataFrame([thing for thing in results])
+    temp1 = pd.DataFrame([thing for thing in results])
+    start = int(datetime.datetime(2021, 3, 1).timestamp())
+    end = int(datetime.datetime(2022, 3, 31).timestamp())
+    results = api.search_submissions(
+        subreddit=subreddit, 
+        after=start, 
+        before=end,
+        mem_safe=True,
+        filter = ('author', 
+            'title',
+            'created_utc',
+            'selftext',
+            'url',
+            'id',
+            'score',
+            'num_comments',
+            'subreddit',
+            'permalink')
+        )
+    temp2 = pd.DataFrame([thing for thing in results])
+    temp = pd.concat([temp1, temp2])
     logging.info(f'Pulled subreddit {subreddit} number of posts: {len(temp)}')
     temp.to_pickle(f'../../Files/Submissions/{subreddit}.pickle')
 

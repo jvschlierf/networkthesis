@@ -88,7 +88,7 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
 
 def main(subreddit): 
     ptype = 'Comments'
-    t = random.randint(0, 60)
+    t = random.randint(0, 300)
     logging.info(f'Pulling subreddit: {subreddit}, but first sleeping for {t}')
     time.sleep(t)
     start = int(datetime.datetime(2020, 3, 1).timestamp())
