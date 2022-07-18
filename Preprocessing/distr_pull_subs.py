@@ -86,29 +86,38 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     res = [i for i in subreddits if i not in done]
     return res
 
+def splittimeframe(subreddit, start, end, split): # splits the time into a series of 
+    split_list = []
+    step = (end - start) / split
+    for i in range(split):
+            s = int(start + i * step)
+            e = int((start + (i + 1) * step) - 1)
+            if i == split - 1:
+                    e += 86400
+            split_list.append([subreddit, s, e])
+
+    return split_list
+
 def main(subreddit): 
     ptype = 'Comments'
-    t = random.randint(0, 300)
+    t = random.randint(0, 600)
     logging.info(f'Pulling subreddit: {subreddit}, but first sleeping for {t}')
     time.sleep(t)
     start = int(datetime.datetime(2020, 3, 1).timestamp())
-    end = int(datetime.datetime(2021, 2, 28).timestamp())
-    y1 = pullSubreddit(subreddit, start, end, ptype)
-    if len(y1) == 0:
-        logging.warning(f'Failed to pull y1 of Subreddit {subreddit}')
-        time.sleep(10)
-    start = int(datetime.datetime(2021, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
-    y2 = pullSubreddit(subreddit, start, end, ptype)
-    if len(y2) == 0:
-        logging.warning(f'Failed to pull y2 of Subreddit {subreddit}')
-        time.sleep(10)
-        return
-    try:
-        total = pd.concat([y1,y2], axis=0).reset_index()
-        total.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
-    except:
-        pass
+    split = 24
+    splitlist = splittimeframe(subreddit, start, end, split)
+    for sub, begin, last in splitlist:
+        temp = pullSubreddit(sub, begin, last, ptype)
+        if len(temp) == 0:
+            logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
+            time.sleep(10)
+        try:
+            logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin / 1e3)} ')
+            temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{begin}.pickle')
+        except:
+            logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin / 1e3)} ')
+            pass
 
 
 with open(args.subreddits, newline='') as f:
