@@ -97,7 +97,6 @@ def main(subreddit):
     if len(y1) == 0:
         logging.warning(f'Failed to pull y1 of Subreddit {subreddit}')
         time.sleep(10)
-        return
     start = int(datetime.datetime(2021, 3, 1).timestamp())
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     y2 = pullSubreddit(subreddit, start, end, ptype)
@@ -105,9 +104,11 @@ def main(subreddit):
         logging.warning(f'Failed to pull y2 of Subreddit {subreddit}')
         time.sleep(10)
         return
-
-    total = pd.concat([y1,y2], axis=0).reset_index()
-    total.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
+    try:
+        total = pd.concat([y1,y2], axis=0).reset_index()
+        total.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
+    except:
+        pass
 
 
 with open(args.subreddits, newline='') as f:
