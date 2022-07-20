@@ -14,7 +14,7 @@ from itertools import chain
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-processes = 6
+processes = 12
 
 
 parser = arg.ArgumentParser()
@@ -129,7 +129,7 @@ subreddits = list(chain.from_iterable(subreddits))
 if __name__ == '__main__':
     logging.info('start')
     subreddits = find_existing_pulls('Comments', subreddits)
-    logging.info(f'pulling comments for {len(subreddits)} subreddits')
+    logging.info(f'pulling Comments for {len(subreddits)} subreddits')
     p1 = Pool(processes, maxtasksperchild=2)
     
     p1.map(main, subreddits)

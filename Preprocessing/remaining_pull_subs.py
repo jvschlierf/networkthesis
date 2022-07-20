@@ -27,7 +27,7 @@ args = parser.parse_args(sys.argv[1:])
 
 logging.basicConfig(
     level=logging.INFO,
-    filename=f'../../Files/logs/distr_pull_subs{datetime.datetime.today()}.log',
+    filename=f'../../Files/logs/remaining_pull_subs{datetime.datetime.today()}.log',
     filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S'
