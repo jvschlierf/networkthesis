@@ -128,7 +128,7 @@ subreddits = list(chain.from_iterable(subreddits))
 
 subs_start = []
 for subreddit in subreddits:
-    subs_start.append([subreddit[:-18], subreddit[-17:-7]])
+    subs_start.append([subreddit[:-18], int(subreddit[-17:-7])])
 
 if __name__ == '__main__':
     logging.info('start')
