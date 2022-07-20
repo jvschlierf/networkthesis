@@ -110,13 +110,13 @@ def main(subreddit):
     step = (end - start) / split
     temp = pullSubreddit(subreddit[0], subreddit[1], subreddit[1]+step, ptype)
     if len(temp) == 0:
-        logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
+        logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
         time.sleep(10)
     try:
-        logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
-        temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{begin}.pickle')
+        logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
+        temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{subreddit[1]}.pickle')
     except:
-        logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")} ')
+        logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")} ')
         pass
 
 
