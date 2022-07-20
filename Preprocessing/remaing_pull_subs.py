@@ -108,7 +108,7 @@ def main(subreddit):
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     split = 24
     step = (end - start) / split
-    temp = pullSubreddit(subreddit[0], subreddit[1], subreddit[1]+step, ptype)
+    temp = pullSubreddit(subreddit[0], subreddit[1], int(subreddit[1])+ int(step), ptype)
     if len(temp) == 0:
         logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
         time.sleep(10)
