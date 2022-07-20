@@ -100,7 +100,7 @@ def splittimeframe(subreddit, start, end, split): # splits the time into a serie
     return split_list
 
 def main(subreddit): 
-    ptype = 'Submissions'
+    ptype = 'Comments'
     t = random.randint(0, 600)
     logging.info(f'Pulling subreddit: {subreddit}, but first sleeping for {t}')
     time.sleep(t)
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     logging.info(f'pulling submissions for {len(subreddits)} subreddits')
     p1 = Pool(processes, maxtasksperchild=2)
     
-    p1.map(main, subreddits)
+    p1.map(main, subs_start)
     p1.close()
    
     logging.info('finished')
