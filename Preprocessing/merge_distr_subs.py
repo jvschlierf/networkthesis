@@ -11,9 +11,9 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 parser = arg.ArgumentParser()
-parser.add_argument('job', type=str, help='type of job to run')
+parser.add_argument('job', type=str, help='type of job to run, either Merge or Identify')
 parser.add_argument('subreddits', type=str, help='csv list of subreddits to pull')
-parser.add_argument('ptype', type=str, help='either Sumbissions or Comments')
+parser.add_argument('ptype', type=str, help='either Submissions or Comments')
 
 args = parser.parse_args(sys.argv[1:])
 
@@ -53,6 +53,21 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     res = [i for i in subreddits if i not in done]
     return res
 
+def merge_splits(files, subreddit, ptype): # merges the files down
+    merge_candidates = []
+    for file in files:
+        if os.path.getsize(f'../../Files/{ptype}/temp/{file}') > 459:
+            if file[:-18] == subreddit:
+                merge_candidates.append(f'../../Files/{ptype}/temp/{file}')
+
+    merge_candidates.sort()
+    if len(merge_candidates) == 24:
+        df = pd.concat([pd.read_pickle(candidate) for candidate in merge_candidates])
+        df.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
+        print(f'{subreddit} merged')
+    else:
+        print(f'{subreddit} has only {len(merge_candidates)} files to merge. Merging not possible.')
+
 with open(args.subreddits, newline='') as f:
     reader = csv.reader(f)
     subreddits = list(reader)
@@ -83,10 +98,18 @@ if args.job == 'Identify':
 if args.job == 'Merge':
     files = []
     files = os.listdir(f'../../Files/{args.ptype}/temp/')
-    files.pop('missing.csv')
+    files.pop(files.index('missing.csv'))
 
-    subreddits = [file[:-18] for file in files]
+    t = [file[:-18] for file in files]
 
+    subreddits = []
+    for i in t:
+        if i not in subreddits:
+            subreddits.append(i)
+
+    for subreddit in subreddits:
+        merge_splits(files, subreddit, args.ptype)
+        
 
 
 
