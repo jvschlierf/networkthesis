@@ -14,7 +14,7 @@ from itertools import chain
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-processes = 32
+processes = 6
 
 
 parser = arg.ArgumentParser()
@@ -26,7 +26,7 @@ args = parser.parse_args(sys.argv[1:])
 
 logging.basicConfig(
     level=logging.INFO,
-    filename=f'../../Files/logs/pull_subs{datetime.datetime.today()}.log',
+    filename=f'../../Files/logs/distr_pull_subs{datetime.datetime.today()}.log',
     filemode='a',
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S'
@@ -34,7 +34,7 @@ logging.basicConfig(
 
 def pullSubreddit(subreddit, start, end, ptype): # Pulls a subreddit from reddit and saves it to a file
     api = pmaw.PushshiftAPI(
-    num_workers=15,
+    num_workers=10,
     rate_limit=100,
     jitter='full'
     )
@@ -113,10 +113,10 @@ def main(subreddit):
             logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
             time.sleep(10)
         try:
-            logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin / 1e3)} ')
+            logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
             temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{begin}.pickle')
         except:
-            logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin / 1e3)} ')
+            logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")} ')
             pass
 
 
