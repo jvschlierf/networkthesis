@@ -4,18 +4,19 @@ import argparse as arg
 import sys
 import datetime
 import csv
+from itertools import chain
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 parser = arg.ArgumentParser()
+parser.add_argument('job', type=str, help='type of job to run')
 parser.add_argument('subreddits', type=str, help='csv list of subreddits to pull')
 parser.add_argument('ptype', type=str, help='either Sumbissions or Comments')
 
 args = parser.parse_args(sys.argv[1:])
 
-print(args.ptype)
 # get files in directory and create list of files
 def get_files(dir):
     files = []
@@ -52,26 +53,40 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     res = [i for i in subreddits if i not in done]
     return res
 
+with open(args.subreddits, newline='') as f:
+    reader = csv.reader(f)
+    subreddits = list(reader)
 
-subreddits_not_completed = find_existing_pulls(args.ptype, args.subreddits)
+subreddits = list(chain.from_iterable(subreddits))
 
-start = int(datetime.datetime(2020, 3, 1).timestamp())
-end = int(datetime.datetime(2022, 3, 31).timestamp())
-split = 24
-missing_parts = []
-for subreddit in subreddits_not_completed:
-    
-    subreddit_parts = splittimeframe(subreddit, start, end, split)
-    missing = identify_missing_files(f'../../Files/{args.ptype}/temp/', subreddit_parts)
-    for m in missing:
-        missing_parts.append(m)
+if args.job == 'Identify':
+    subreddits_not_completed = find_existing_pulls(args.ptype, subreddits)
+
+    start = int(datetime.datetime(2020, 3, 1).timestamp())
+    end = int(datetime.datetime(2022, 3, 31).timestamp())
+    split = 24
+    missing_parts = []
+    for subreddit in subreddits_not_completed:
+        
+        subreddit_parts = splittimeframe(subreddit, start, end, split)
+        missing = identify_missing_files(f'../../Files/{args.ptype}/temp/', subreddit_parts)
+        for m in missing:
+            missing_parts.append(m)
 
 
-file = open(f'../../Files/{args.ptype}/temp/missing.csv', "w")
-writer = csv.writer(file, delimiter = "\n")
-for list_ in missing_parts:
-     writer.writerow([list_])
-file.close()
+    file = open(f'../../Files/{args.ptype}/temp/missing.csv', "w")
+    writer = csv.writer(file, delimiter = "\n")
+    for list_ in missing_parts:
+        writer.writerow([list_])
+    file.close()
+
+if args.job == 'Merge':
+    files = []
+    files = os.listdir(f'../../Files/{args.ptype}/temp/')
+    files.pop('missing.csv')
+
+    subreddits = [file[:-18] for file in files]
+
 
 
 
