@@ -65,6 +65,8 @@ def merge_splits(files, subreddit, ptype): # merges the files down
         df = pd.concat([pd.read_pickle(candidate) for candidate in merge_candidates])
         df.to_pickle(f'../../Files/{ptype}/{subreddit}.pickle')
         print(f'{subreddit} merged')
+        for i in merge_candidates:
+            os.remove(i)
     else:
         print(f'{subreddit} has only {len(merge_candidates)} files to merge. Merging not possible.')
 
