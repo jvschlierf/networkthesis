@@ -125,6 +125,7 @@ with open(args.subreddits, newline='') as f:
     subreddits = list(reader)
 
 subreddits = list(chain.from_iterable(subreddits))
+subreddits = subreddits[::-1]
 
 if __name__ == '__main__':
     logging.info('start')
