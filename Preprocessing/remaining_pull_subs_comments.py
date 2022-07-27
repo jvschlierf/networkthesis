@@ -108,13 +108,14 @@ def main(subreddit):
     end = int(datetime.datetime(2022, 3, 31).timestamp())
     split = 24
     step = (end - start) / split
-    temp = pullSubreddit(subreddit[0], subreddit[1], int(subreddit[1])+ int(step), ptype)
+    temp = pullSubreddit(subreddit[0], int(subreddit[1]), int(subreddit[1])+ int(step), ptype)
     if len(temp) == 0:
         logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
         time.sleep(10)
-    
-    temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit[0]}-{subreddit[1]}.pickle')
-    logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
+        
+    else:
+        temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit[0]}-{subreddit[1]}.pickle')
+        logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(subreddit[1]).strftime("%m/%d/%Y, %H:%M:%S")}')
 
 
 with open(args.subreddits, newline='') as f:
