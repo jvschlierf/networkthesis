@@ -4,15 +4,18 @@ File to control text classification models as part of Analysis of Pro- & Anti- V
 import os
 import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
-from transformers import Trainer, TrainingArguments
+from transformers import Trainer, TrainingArguments, AutoTokenizer, AutoModel, pipeline, AutoModelForSequenceClassification
 import numpy as np
 from datasets import Dataset
 import pandas as pd
 
 df = pd.read_pickle('../../../Files/Submissions/train/submission_train_sm.pickle')
 
-tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
-model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels= 3)
+model_name = 'distilbert-base-uncased-finetuned-sst-2-english'
+tokenizer = DistilBertTokenizer
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+
+#, warmup = 600, max_sequence_length=128, training_rate=1e-5,
 
 df['text'] = df['title']
 df['labels'] = df['label']
@@ -47,14 +50,12 @@ for name, param in model.named_parameters():
 
 
 training_args = TrainingArguments(
+    load_best_model_at_end=True,
     output_dir = '../../Files/models/distilbert_model/',
     overwrite_output_dir=True,
-    num_train_epocs=5,
-    batch_size=32,
-    warmup = 600, 
-    max_sequence_length=128,
+    num_train_epochs=5,
+    per_device_train_batch_size=32, 
     evaluation_strategy='epoch',
-    training_rate=1e-5,
     logging_dir='../../Files/logs/', 
     save_strategy = "epoch",
     save_steps=10_000, save_total_limit=2, )
@@ -67,7 +68,7 @@ trainer = Trainer(
     train_dataset=dataset_splitted['train'],
     eval_dataset=dataset_splitted['test'],
     compute_metrics=compute_metrics,
-),
+)
 
 
 trainer.train()
