@@ -6,19 +6,19 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from transformers import Trainer, TrainingArguments
 import numpy as np
-from datasets import load_metric, Datasets
+from datasets import Dataset
 import pandas as pd
 
-df = pd.read_pickle('../../Files/Submissions/train/submission_train_sm.pickle')
+df = pd.read_pickle('../../../Files/Submissions/train/submission_train_sm.pickle')
 
 tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-uncased")
 model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels= 3)
 
 df['text'] = df['title']
 df['labels'] = df['label']
-df = df['text', 'labels']
+df = df[['text', 'labels']]
 
-dataset = Datasets.from_pandas(df)
+dataset = Dataset.from_pandas(df)
 
 def tokenize_function(examples):
     return tokenizer(examples["text"], padding=True, truncation=True)
