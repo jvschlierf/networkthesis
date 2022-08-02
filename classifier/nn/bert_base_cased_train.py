@@ -11,30 +11,28 @@ from datasets import Dataset, load_metric
 import pandas as pd
 
 
-df = pd.read_pickle('../../../Files/Submissions/train/submission_train_sm_v2.pickle')
-df['text'] = df['title']
-# df['label'] = df['label'].fillna(0)
-# df['label'] = df['label'].astype(int)
-# df.loc[df["label"] == -1, "label"] = 2
-# df['labels'] = df['label']
-df = df[['text', 'label']]
-# df = df[df['labels'] != '0']
-# df = df[df['labels'].notna()]
-# df.loc[df["labels"] == -1, "labels"] = 0
+train = pd.read_pickle('../../../Files/Submissions/train/train_split_submission.pickle')
+train['text'] = train['title']
+train = train[['text', 'label']]
+train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
+valid = pd.read_pickle('../../../Files/Submissions/train/val_split_submission.pickle')
+valid['text'] = valid['title']
+valid = valid[['text', 'label']]
+valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
 model_name = 'bert-base-cased'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-dataset = Dataset.from_pandas(df, preserve_index=False)
 
 def tokenize_function(examples):
     return tokenizer(examples["text"], padding="max_length", truncation=True)
 
 
 
-tokenized_dataset = dataset.map(tokenize_function, batched=True)
+train_dataset_tok = train_dataset.map(tokenize_function, batched=True)
+valid_dataset_tok = valid_dataset.map(tokenize_function, batched=True)
 
-dataset_splitted = tokenized_dataset.shuffle(1337).train_test_split(0.2, seed=42, stratify_by_column="label")
+
 
 # dataset_splitted.to_df
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
@@ -70,8 +68,8 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=dataset_splitted['train'],
-    eval_dataset=dataset_splitted['test'],
+    train_dataset=train_dataset_tok,
+    eval_dataset=valid_dataset_tok,
     compute_metrics=compute_metrics,
 )
 
