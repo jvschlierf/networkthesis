@@ -56,9 +56,12 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
 def merge_splits(files, subreddit, ptype): # merges the files down
     merge_candidates = []
     for file in files:
-        if os.path.getsize(f'../../Files/{ptype}/temp/{file}') > 459:
-            if file[:-18] == subreddit:
-                merge_candidates.append(f'../../Files/{ptype}/temp/{file}')
+        try:
+            if os.path.getsize(f'../../Files/{ptype}/temp/{file}') > 459:
+                if file[:-18] == subreddit:
+                    merge_candidates.append(f'../../Files/{ptype}/temp/{file}')
+        except FileNotFoundError:
+            pass
 
     merge_candidates.sort()
     if len(merge_candidates) == 24:

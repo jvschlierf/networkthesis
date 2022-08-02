@@ -11,11 +11,11 @@ from datasets import Dataset, load_metric
 import pandas as pd
 
 
-df = pd.read_pickle('../../../Files/Submissions/train/submission_train_sm.pickle')
+df = pd.read_pickle('../../../Files/Submissions/train/submission_train_sm_v2.pickle')
 df['text'] = df['title']
-df['label'] = df['label'].fillna(0)
-df['label'] = df['label'].astype(int)
-df.loc[df["label"] == -1, "label"] = 2
+# df['label'] = df['label'].fillna(0)
+# df['label'] = df['label'].astype(int)
+# df.loc[df["label"] == -1, "label"] = 2
 # df['labels'] = df['label']
 df = df[['text', 'label']]
 # df = df[df['labels'] != '0']
@@ -34,8 +34,9 @@ def tokenize_function(examples):
 
 tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
-dataset_splitted = tokenized_dataset.shuffle(1337).train_test_split(0.1)
+dataset_splitted = tokenized_dataset.shuffle(1337).train_test_split(0.2, seed=42, stratify_by_column="label")
 
+# dataset_splitted.to_df
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 
