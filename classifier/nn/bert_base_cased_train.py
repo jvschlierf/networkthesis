@@ -42,7 +42,7 @@ for name, param in model.named_parameters():
     param.requires_grad = True
 
 
-metric = load_metric("accuracy")
+metric = load_metric("auc")
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
