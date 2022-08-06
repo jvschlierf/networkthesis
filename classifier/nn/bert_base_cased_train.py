@@ -12,12 +12,12 @@ import pandas as pd
 
 
 train = pd.read_pickle('../../../Files/Submissions/train/train_split_submission.pickle')
-train['text'] = train['title']
+train['text'] = train['cleanTitle']
 train = train[['text', 'label']]
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
 valid = pd.read_pickle('../../../Files/Submissions/train/val_split_submission.pickle')
-valid['text'] = valid['title']
+valid['text'] = valid['cleanTitle']
 valid = valid[['text', 'label']]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
@@ -39,10 +39,8 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name, num_label
 
 
 for name, param in model.named_parameters():
-    if name in ['classifier.weight', 'classifier.bias']:
-        param.requires_grad = True
-    else:
-        param.requires_grad = False
+    param.requires_grad = True
+
 
 metric = load_metric("accuracy")
 
@@ -54,9 +52,9 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/',
+    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained/',
     overwrite_output_dir=True,
-    num_train_epochs=10,
+    num_train_epochs=5,
     per_device_train_batch_size=32, 
     evaluation_strategy='epoch',
     logging_dir='../../Files/logs/', 
