@@ -112,12 +112,13 @@ def main(subreddit):
         if len(temp) == 0:
             logging.warning(f'Failed to pull Subreddit {subreddit} with {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
             time.sleep(10)
-        try:
-            logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
-            temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{begin}.pickle')
-        except:
-            logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")} ')
-            pass
+        else:
+            try:
+                logging.info(f'pulled Subreddit {subreddit} with {ptype} {len(temp)} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")}')
+                temp.to_pickle(f'../../Files/{ptype}/temp/{subreddit}-{begin}.pickle')
+            except:
+                logging.info(f'failed to save Subreddit {subreddit} with {ptype} {len(temp )} with begin {datetime.datetime.fromtimestamp(begin).strftime("%m/%d/%Y, %H:%M:%S")} ')
+                pass
 
 
 with open(args.subreddits, newline='') as f:
