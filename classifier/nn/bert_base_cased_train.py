@@ -42,24 +42,24 @@ for name, param in model.named_parameters():
     param.requires_grad = True
 
 
-metric = load_metric("auc")
+metric = load_metric("roc_auc")
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
+    return metric.compute(prediction_scores=predictions, references=labels)
 
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
     output_dir = '../../../Files/models/bert_base_cased_model/fully_trained/',
     overwrite_output_dir=True,
-    num_train_epochs=5,
-    per_device_train_batch_size=32, 
+    num_train_epochs=3,
+    per_device_train_batch_size=64, 
     evaluation_strategy='epoch',
     logging_dir='../../Files/logs/', 
     save_strategy = "epoch",
-    save_steps=10_000, save_total_limit=2, )
+    save_steps=10_000, save_total_limit=4, )
 
 
 
