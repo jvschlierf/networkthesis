@@ -47,7 +47,7 @@ metric = load_metric("roc_auc")
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
-    return metric.compute(prediction_scores=predictions, references=labels)
+    return metric.compute(prediction_scores=predictions, references=labels, multi_class='ovo')
 
 
 training_args = TrainingArguments(
