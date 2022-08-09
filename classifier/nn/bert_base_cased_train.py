@@ -33,21 +33,19 @@ train_dataset_tok = train_dataset.map(tokenize_function, batched=True)
 valid_dataset_tok = valid_dataset.map(tokenize_function, batched=True)
 
 
-
-# dataset_splitted.to_df
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
 
-for name, param in model.named_parameters():
+for name, param in model.named_parameters(): # We train the entire model, not just the classifier
     param.requires_grad = True
 
 
-metric = load_metric("accuracy")
+metric = load_metric("roc_auc", "multiclass") # we evaluate performance on Area under curve
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return metric.compute(prediction_scores=predictions, references=labels)
+    predictions = (logits == logits.max(axis=1)[:,None]).astype(int) # We set the highest value to 1, and the rest to 0 to evaluate AUC
+    return metric.compute(prediction_scores=predictions, references=labels, multi_class='ovo') # for stability, we choose one vs one compariso (ovo)
 
 
 training_args = TrainingArguments(
