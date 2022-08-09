@@ -22,7 +22,7 @@ train_dataset = Dataset.from_pandas(train, preserve_index=False)
 valid = pd.read_pickle('../../../Files/Submissions/train/val_split_submission.pickle')
 valid['text'] = valid['cleanTitle']
 valid = valid[['text', 'label']]
-valid = valid[0:100]
+valid = valid[0:50]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
 model_name = 'bert-base-cased'
@@ -46,12 +46,12 @@ for name, param in model.named_parameters():
     param.requires_grad = True
 
 
-metric = load_metric("accuracy")
+metric = load_metric("roc_auc", "multiclass")
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return metric.compute(prediction_scores=predictions, references=labels)
+    # predictions = np.argmax(logits, axis=-1)
+    return metric.compute(prediction_scores=logits, references=labels, multi_class='ovo')
 
 
 training_args = TrainingArguments(
