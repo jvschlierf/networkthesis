@@ -10,15 +10,19 @@ import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
 
-
 train = pd.read_pickle('../../../Files/Submissions/train/train_split_submission.pickle')
 train['text'] = train['cleanTitle']
 train = train[['text', 'label']]
+train = train[0:100]
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
+
+
+
 
 valid = pd.read_pickle('../../../Files/Submissions/train/val_split_submission.pickle')
 valid['text'] = valid['cleanTitle']
 valid = valid[['text', 'label']]
+valid = valid[0:100]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
 model_name = 'bert-base-cased'
