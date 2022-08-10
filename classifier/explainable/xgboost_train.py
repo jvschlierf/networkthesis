@@ -2,7 +2,7 @@ import pandas as pd
 
 import numpy as np
 from sklearn.model_selection import GridSearchCV
-import classifier.explainable.xgboost_train as xgb
+import xgboost as xgb
 from joblib import dump
 
 target = 'label'
@@ -71,16 +71,15 @@ val_labels = valid_data[target]
 val_instances_int = convert2ints(val_instances)
 val_labels_int = [label2int[label] for label in val_labels]
 
-from keras.utils import to_categorical
+# from keras.utils import to_categorical
 
-train_labels_1hot = to_categorical(train_labels_int, len(label2int))
-test_labels_1hot = to_categorical(test_labels_int, len(label2int))
-val_labels_1hot = to_categorical(val_labels_int, len(label2int))
+# train_labels_1hot = to_categorical(train_labels_int, len(label2int))
+# test_labels_1hot = to_categorical(test_labels_int, len(label2int))
+# val_labels_1hot = to_categorical(val_labels_int, len(label2int))
 
 # compute 95th percentile of training sentence lengths
 L = sorted(map(len, train_instances))
 MAX_LENGTH = L[int(len(L)*0.95)]
-print(MAX_LENGTH)
 
 # apply padding
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -89,10 +88,11 @@ test_instances_int = pad_sequences(test_instances_int, padding='post', maxlen=MA
 val_instances_int = pad_sequences(val_instances_int, padding='post', maxlen=MAX_LENGTH)
 
 
-params = { 'mad_depth' : [3, 5, 6, 8, 10],
+params = { 'num_class': [3], 
+        'max_depth' : [3, 5, 6, 8, 10],
         'learning_rate' : [0.01, 0.05, 0.1],
         'n_estimators' : [100, 500, 1000],
-        'objective': ['multi:softmax', 'multi:softprob'],
+        'objective': ['multi:softprob'],
         'colsample_bytree': [0.5, 0.7, 1]
 }
 
@@ -108,7 +108,7 @@ clf = GridSearchCV(estimator = xgbc,
 
 print('Setup completed, training now')
 
-clf.fit(train_instances_int, train_labels_1hot)
+clf.fit(train_instances_int, train_labels_int)
 
 df1 = pd.DataFrame(clf.cv_results)
 df1.to_csv('xgboost_results.csv')
