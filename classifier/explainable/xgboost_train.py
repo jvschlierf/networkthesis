@@ -2,7 +2,7 @@ import pandas as pd
 
 import numpy as np
 from sklearn.model_selection import GridSearchCV
-import xgboost as xgb
+import classifier.explainable.xgboost_train as xgb
 from joblib import dump
 
 target = 'label'
