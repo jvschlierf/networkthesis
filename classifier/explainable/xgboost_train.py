@@ -110,14 +110,13 @@ print('Setup completed, training now')
 
 clf.fit(train_instances_int, train_labels_int)
 
-df1 = pd.DataFrame(clf.cv_results)
+dump(clf, 'xgbCVGridSearch.joblib')
+df1 = pd.DataFrame(clf.cv_results_)
 df1.to_csv('xgboost_results.csv')
 
 print("Best parameters:", clf.best_params_)
-print("Lowest RMSE: ", (-clf.best_score_)**(1/2.0))
+print("Highest AUC: ", (clf.best_score_))
 
 model = clf.best_estimator_
 
-
-dump(clf, 'xgbCVGridSearch.joblib')
 dump(model, 'xgbBest_CV.joblib') 
