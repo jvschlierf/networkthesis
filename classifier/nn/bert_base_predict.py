@@ -6,12 +6,15 @@ import numpy as np
 import pandas as pd
 from transformers import TextClassificationPipeline
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 test = pd.read_pickle('../../../Files/Submissions/train/test_split_submission.pickle')
 test['text'] = test['cleanTitle']
 test = test[['text']]
 
-test = test.values.to_list()
+test = test.values.tolist()
 
 model_name = 'bert-base-cased'
 tokenizer = AutoTokenizer.from_pretrained(model_name, padding="max_length", truncation=True)
