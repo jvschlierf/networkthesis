@@ -50,9 +50,9 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained/',
+    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_5/',
     overwrite_output_dir=True,
-    num_train_epochs=3,
+    num_train_epochs=5,
     per_device_train_batch_size=64, 
     evaluation_strategy='epoch',
     logging_dir='../../Files/logs/', 
