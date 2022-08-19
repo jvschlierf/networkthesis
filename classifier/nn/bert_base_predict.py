@@ -27,16 +27,15 @@ files = [f for f in files if f.endswith('.pickle')]
 print(f"setup completed, scoring {len(files)} subreddits")
 
 for file in tqdm(files):
-    test = pd.read_pickle(f'../../../Files/Submissions/{file}')
+    test = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
     testlist = []
     for i,j in test.iterrows():
         testlist.append(j['cleanTitle'])
-    results = classifier(testlist[:100], top_k=2)
+    #score each submisssion title
+    results = classifier(testlist)
 
     for i, j in test.iterrows():
-        test.at[i, 'pred_1'] = np.int64(results[i][0]['label'][-1])
-        test.at[i, 'conf_1'] = results[i][0]['score']
-        test.at[i, 'pred_2'] = np.int64(results[i][1]['label'][-1])
-        test.at[i, 'conf_2'] = results[i][1]['score']
+        test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
+        test.at[i, 'conf_1'] = results[i]['score']
     
     test.to_pickle(f'../../../Files/Submissions/score/{file}')
