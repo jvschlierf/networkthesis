@@ -14,10 +14,10 @@ os.chdir(dname)
 
 
 model_name = 'bert-base-cased'
-tokenizer = AutoTokenizer.from_pretrained(model_name, padding="max_length", truncation=True)
+tokenizer = AutoTokenizer.from_pretrained(model_name, padding=True, truncation=True)
 model = AutoModelForSequenceClassification.from_pretrained('../../../Files/models/bert_base_cased_model/fully_trained_5/checkpoint-2158/')
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, device=1)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, batch_size = 25, device=1)
 
 files = os.listdir('../../../Files/Submissions/score/')
 
@@ -27,6 +27,7 @@ files = [f for f in files if f.endswith('.pickle')]
 print(f"setup completed, scoring {len(files)} subreddits")
 
 for file in tqdm(files):
+    print(file)
     test = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
     testlist = []
     for i,j in test.iterrows():
@@ -38,4 +39,4 @@ for file in tqdm(files):
         test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
         test.at[i, 'conf_1'] = results[i]['score']
     
-    test.to_pickle(f'../../../Files/Submissions/score/{file}')
+    test.to_pickle(f'../../../Files/Submissions/score/done/{file}')
