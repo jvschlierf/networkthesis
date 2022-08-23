@@ -9,7 +9,7 @@ from transformers import Trainer, TrainingArguments, AutoTokenizer, AutoModel, p
 import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
-torch.cuda_set_device(1)
+
 
 train = pd.read_pickle('../../../Files/Submissions/train/train_split_submission.pickle')
 train['text'] = train['cleanTitle']
