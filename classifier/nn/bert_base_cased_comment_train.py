@@ -11,13 +11,13 @@ from datasets import Dataset, load_metric
 import pandas as pd
 
 
-train = pd.read_pickle('../../../Files/Comments/train/train_split_submission.pickle')
+train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
 train = train[['text', 'label']]
 train = train.sample(1000) # REMOVE TO TRAIN LARGE
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
-valid = pd.read_pickle('../../../Files/Comments/train/val_split_submission.pickle')
+valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments.pickle')
 valid['text'] = valid['cleanBody']
 valid = valid[['text', 'label']]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
