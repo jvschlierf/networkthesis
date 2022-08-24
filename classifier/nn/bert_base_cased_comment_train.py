@@ -9,11 +9,8 @@ from transformers import Trainer, TrainingArguments, AutoTokenizer, AutoModel, p
 import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
-from numba import cuda
 
-cuda.select_device(0)
-cuda.close()
-cuda.select_device(0)
+torch.cuda.empty_cache()
 
 train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
