@@ -11,11 +11,14 @@ from datasets import Dataset, load_metric
 import pandas as pd
 
 torch.cuda.empty_cache()
+from numba import cuda
+cuda.select_device(0)
+cuda.close()
+cuda.select_device(0)
 
 train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
 train = train[['text', 'label']]
-train = train.sample(1000) # REMOVE TO TRAIN LARGE
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
 valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments.pickle')
