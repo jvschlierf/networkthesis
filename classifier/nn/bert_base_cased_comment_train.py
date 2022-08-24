@@ -10,11 +10,6 @@ import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
 
-torch.cuda.empty_cache()
-from numba import cuda
-cuda.select_device(0)
-cuda.close()
-cuda.select_device(0)
 
 train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
@@ -59,12 +54,12 @@ training_args = TrainingArguments(
     output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_comments/',
     overwrite_output_dir=True,
     num_train_epochs=5,
-    per_device_train_batch_size=8, 
+    per_device_train_batch_size=32, 
     evaluation_strategy='epoch',
     logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",
     save_steps=10_000, save_total_limit=4,
-    eval_accumulation_steps=1, )
+    eval_accumulation_steps=8, )
 
 
 
