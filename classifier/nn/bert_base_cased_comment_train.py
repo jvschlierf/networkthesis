@@ -24,6 +24,7 @@ train_dataset = Dataset.from_pandas(train, preserve_index=False)
 valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments.pickle')
 valid['text'] = valid['cleanBody']
 valid = valid[['text', 'label']]
+valid = valid.sample(10000)
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
 model_name = 'bert-base-cased'
