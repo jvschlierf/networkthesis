@@ -26,7 +26,7 @@ model_name = 'bert-base-cased'
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 def tokenize_function(examples):
-    return tokenizer(examples["text"], padding='max_length', truncation='longest_first', return_tensors="pt")
+    return tokenizer(examples["text"], padding='max_length', truncation='longest_first')
 
 
 
