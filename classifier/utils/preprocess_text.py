@@ -39,9 +39,7 @@ if __name__ == '__main__':
     print('Cleaning data...')
     files = os.listdir(os.path.join('../../../Files/',dir))
 
-    for file in files:
-        if file[-7:] != ".pickle":
-            files.pop(files.index(file))
+    files = [files.remove(file) for file in files if file.endswith('.pickle')]
 
     for file in tqdm(files):
         df = pd.read_pickle(os.path.join('../../../Files/',dir,file))
