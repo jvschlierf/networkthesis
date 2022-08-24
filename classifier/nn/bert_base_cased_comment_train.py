@@ -10,6 +10,7 @@ import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
