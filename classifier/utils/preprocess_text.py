@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     for file in tqdm(files):
         df = pd.read_pickle(os.path.join('../../../Files/',dir,file))
-        df['cleanTitle']=df['title'].map(lambda s:preprocess(s)) 
+        df['cleanBody']=df['body'].map(lambda s:preprocess(s)) 
         df.to_pickle(os.path.join('../../../Files/',dir,file))
 
     print('Done!')

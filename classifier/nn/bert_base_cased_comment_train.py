@@ -20,7 +20,6 @@ train_dataset = Dataset.from_pandas(train, preserve_index=False)
 valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments.pickle')
 valid['text'] = valid['cleanBody']
 valid = valid[['text', 'label']]
-valid = valid.sample(10000)
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
 model_name = 'bert-base-cased'
@@ -52,10 +51,10 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_comments/',
+    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_comments2/',
     overwrite_output_dir=True,
     num_train_epochs=5,
-    per_device_train_batch_size=8, 
+    per_device_train_batch_size=16, 
     evaluation_strategy='epoch',
     logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",

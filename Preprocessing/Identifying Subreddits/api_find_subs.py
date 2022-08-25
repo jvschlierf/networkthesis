@@ -1,3 +1,7 @@
+"""
+Implements Greedy Algorithm to identify sub-network in Reddit concerning vaccines by sampling from subreddits and identifying cross posts
+"""
+
 
 from pmaw import PushshiftAPI
 import datetime as dt 
@@ -7,10 +11,7 @@ import os, sys
 import numpy as np
 import logging
 
-# OPEN
-# - Args to influence the following:
-#   - subreddits as initials (maybe als csv?)
-#   - time (start and end)
+
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
