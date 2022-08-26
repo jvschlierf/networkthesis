@@ -5,7 +5,7 @@ import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
 train['text'] = train['cleanBody']
@@ -49,7 +49,7 @@ training_args = TrainingArguments(
     output_dir = '../../../Files/models/ROBERTA_base/Comments/Fully/',
     overwrite_output_dir=True,
     num_train_epochs=5,
-    per_device_train_batch_size=32, 
+    per_device_train_batch_size=16, 
     evaluation_strategy='epoch',
     logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",
