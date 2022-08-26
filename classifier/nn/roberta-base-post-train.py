@@ -50,7 +50,8 @@ training_args = TrainingArguments(
     evaluation_strategy='epoch',
     logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",
-    save_steps=10_000, save_total_limit=4, )
+    save_steps=10_000, save_total_limit=4,
+    eval_accumulation_steps=1 )
 
 trainer = Trainer(
     model=model,
