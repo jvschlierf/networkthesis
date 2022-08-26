@@ -7,12 +7,12 @@ import pandas as pd
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-train = pd.read_pickle('../../../Files/Comments/train/train_split_comments.pickle')
+train = pd.read_pickle('../../../Files/Comments/train/train_split_comments_s.pickle')
 train['text'] = train['cleanBody']
 train = train[['text', 'label']]
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
-valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments.pickle')
+valid = pd.read_pickle('../../../Files/Comments/train/val_split_comments_s.pickle')
 valid['text'] = valid['cleanBody']
 valid = valid[['text', 'label']]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
