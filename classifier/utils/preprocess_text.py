@@ -19,6 +19,7 @@ os.chdir(dname)
 
 parser = arg.ArgumentParser()
 parser.add_argument('dir', type=str, help='directory to clean')
+parser.add_argument('ptype',type=str, help='either "Submissions" or "Comments"' )
 
 args = parser.parse_args(sys.argv[1:])
 
@@ -41,10 +42,19 @@ if __name__ == '__main__':
 
     files = [files.remove(file) for file in files if file.endswith('.pickle')]
 
-    for file in tqdm(files):
-        df = pd.read_pickle(os.path.join('../../../Files/',dir,file))
-        df['cleanBody']=df['body'].map(lambda s:preprocess(s)) 
-        df.to_pickle(os.path.join('../../../Files/',dir,file))
+
+    if args.ptype == 'Comments':
+        for file in tqdm(files):
+            df = pd.read_pickle(os.path.join('../../../Files/',dir,file))
+            df['cleanBody'] = df['body'].apply(preprocess)
+            df.to_pickle(os.path.join('../../../Files/',dir,file))
+
+    elif args.ptype == 'Submissions':
+        for file in tqdm(files):
+            df = pd.read_pickle(os.path.join('../../../Files/',dir,file))
+            df['text'] = df['title']  + ' ' + df['selftext']
+            df['cleanText']=df['text'].map(lambda s:preprocess(s)) 
+            df.to_pickle(os.path.join('../../../Files/',dir,file))
 
     print('Done!')
 
