@@ -29,11 +29,8 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name, num_label
 train_dataset_tok = train_dataset.map(tokenize_function, batched=True)
 valid_dataset_tok = valid_dataset.map(tokenize_function, batched=True)
 
-for name, param in model.named_parameters(): # We train only the classifier
-    if name in ['classifier.dense.weight', 'classifier.dense.bias', 'classifier.out_proj.weight', 'classifier.out_proj.bias']:
-        param.requires_grad = True
-    else:
-        param.requires_grad = False
+for name, param in model.named_parameters(): # We train the entire model
+    param.requires_grad = True
 
 
 metric = load_metric("roc_auc", "multiclass") # we evaluate performance on Area under curve
@@ -46,7 +43,7 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/ROBERTA_base/Posts/',
+    output_dir = '../../../Files/models/ROBERTA_base/Posts/Fully/',
     overwrite_output_dir=True,
     num_train_epochs=5,
     per_device_train_batch_size=64, 

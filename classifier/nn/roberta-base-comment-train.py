@@ -46,7 +46,7 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/fully__trained_comment_ROBERT/',
+    output_dir = '../../../Files/models/ROBERTA_base/Comments/Fully/',
     overwrite_output_dir=True,
     num_train_epochs=5,
     per_device_train_batch_size=64, 

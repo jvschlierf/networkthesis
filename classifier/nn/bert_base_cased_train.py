@@ -14,7 +14,6 @@ import pandas as pd
 train = pd.read_pickle('../../../Files/Submissions/train/train_split_submission.pickle')
 train['text'] = train['cleanTitle']
 train = train[['text', 'label']]
-train = train.sample(1000) # REMOVE TO TRAIN LARGE
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
 valid = pd.read_pickle('../../../Files/Submissions/train/val_split_submission.pickle')
@@ -51,7 +50,7 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_PROFILED/',
+    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained/',
     overwrite_output_dir=True,
     num_train_epochs=5,
     per_device_train_batch_size=64, 
