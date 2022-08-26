@@ -62,3 +62,6 @@ trainer = Trainer(
     eval_dataset=valid_dataset_tok,
     compute_metrics=compute_metrics,
 )
+
+#train the model
+trainer.train()
