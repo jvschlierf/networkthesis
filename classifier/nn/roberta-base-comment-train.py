@@ -51,7 +51,7 @@ training_args = TrainingArguments(
     num_train_epochs=5,
     per_device_train_batch_size=64, 
     evaluation_strategy='epoch',
-    logging_dir='../../Files/logs/', 
+    logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",
     save_steps=10_000, save_total_limit=4, )
 
