@@ -1,8 +1,3 @@
-"""
-Trains the Bert Base Cased model using Huggingface
-"""
-
-
 import os
 import torch
 from transformers import Trainer, TrainingArguments, AutoTokenizer, AutoModel, pipeline, AutoModelForSequenceClassification
@@ -22,23 +17,23 @@ valid['text'] = valid['cleanBody']
 valid = valid[['text', 'label']]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
-model_name = 'bert-base-cased'
+model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 def tokenize_function(examples):
-    return tokenizer(examples["text"], padding=True, truncation=True)
-
-
-
-train_dataset_tok = train_dataset.map(tokenize_function, batched=True)
-valid_dataset_tok = valid_dataset.map(tokenize_function, batched=True)
+    return tokenizer(examples["text"], padding='max_length', truncation=True, max_length=511)
 
 
 model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
 
+train_dataset_tok = train_dataset.map(tokenize_function, batched=True)
+valid_dataset_tok = valid_dataset.map(tokenize_function, batched=True)
 
-for name, param in model.named_parameters(): # We train the entire model, not just the classifier
-    param.requires_grad = True
+for name, param in model.named_parameters(): # We train only the classifier
+    if name in ['classifier.dense.weight', 'classifier.dense.bias', 'classifier.out_proj.weight', 'classifier.out_proj.bias']:
+        param.requires_grad = True
+    else:
+        param.requires_grad = False
 
 
 metric = load_metric("roc_auc", "multiclass") # we evaluate performance on Area under curve
@@ -51,17 +46,14 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/bert_base_cased_model/fully_trained_comments2/',
+    output_dir = '../../../Files/models/bert_base_cased_model/fully__trained_comment_ROBERT/',
     overwrite_output_dir=True,
     num_train_epochs=5,
-    per_device_train_batch_size=8, 
+    per_device_train_batch_size=64, 
     evaluation_strategy='epoch',
-    logging_dir='../../../Files/logs/', 
+    logging_dir='../../Files/logs/', 
     save_strategy = "epoch",
-    save_steps=10_000, save_total_limit=4,
-    eval_accumulation_steps=1, )
-
-
+    save_steps=10_000, save_total_limit=4, )
 
 trainer = Trainer(
     model=model,
@@ -70,6 +62,3 @@ trainer = Trainer(
     eval_dataset=valid_dataset_tok,
     compute_metrics=compute_metrics,
 )
-
-
-trainer.train()
