@@ -11,7 +11,7 @@ trainc = pd.read_pickle('../../../Files/Comments/train/train_split_comments_s.pi
 trainc['text'] = trainc['cleanBody']
 trainc = trainc[['text', 'label']]
 
-trainp = pd.read_pickle('../../../Files/Submissions/train/train_split_posts_s.pickle')
+trainp = pd.read_pickle('../../../Files/Submissions/train/train_split_submission_r.pickle')
 trainp['text'] = trainp['cleanText']
 trainp = trainp[['text', 'label']]
 
