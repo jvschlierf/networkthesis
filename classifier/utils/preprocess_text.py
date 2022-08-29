@@ -42,7 +42,10 @@ if __name__ == '__main__':
 
     files =  [file for file in files if file.endswith('.pickle')]
 
-
+    files = ('CovidVaccineInjury.pickle', 'CovidVaccinated.pickle', 'NoNewNormal.pickle','lostgeneration.pickle', 'EUnews.pickle', 'chomsky.pickle', 'conservatives.pickle',
+    'AncientTruehistory.pickle', 'The_Ultimate.pickle', 'LockdownCriticalLeft.pickle', 'InternationalLeft.pickle', 'anime_titties.pickle', 'WomenInNews.pickle','ReallyAmerican.pickle',
+    'NEWPOLITIC.pickle', 'NoNoNewNormal.pickle' ,'ConspiracyUltra.pickle', 'AutisticPride.pickle','Sino.pickle' ,'conspiracyNOPOL.pickle', 'Palestine.pickle' ,'EcoNewsNetwork.pickle',
+    'QAnonCasualties.pickle' ,'LouderWithCrowder.pickle')
     if args.ptype == 'Comments':
         for file in tqdm(files):
             df = pd.read_pickle(os.path.join('../../../Files/',dirs,file))

@@ -77,7 +77,8 @@ for comment in comments_open:
                 print(f'passed end check for {comment}, merging now')
                 df = pd.concat([pd.read_pickle(os.path.join('../../Files/Comments/temp/', candidate)) for candidate in comment_files])
                 df.to_pickle(f'../../Files/Comments/{comment}.pickle')
-                print(f'{comment} merged')
+                print(f'{comment} merged, removing now')
+                [os.remove(os.path.join('../../Files/Comments/temp/', c)) for c in comment_files]
 
 
 
