@@ -47,7 +47,7 @@ def splittimeframe(subreddit, start, end, split): # splits the time into a serie
     return split_list
 
 def find_existing_pulls(type, subreddits): #remove existing pulls from subreddits list
-    done = os.listdir(f'../../Files/{type}/')
+    done = os.listdir(f'../../Files/{type}/score/')
     for i in done:
         done[done.index(i)] = i[:-7]
     res = [i for i in subreddits if i not in done]
