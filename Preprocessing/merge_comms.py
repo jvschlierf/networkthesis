@@ -33,7 +33,7 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     return res
 
 
-with open(args.subreddits, newline='') as f:
+with open(args.subreddit, newline='') as f:
     reader = csv.reader(f)
     subreddits = list(reader)
 
