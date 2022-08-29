@@ -29,7 +29,7 @@ def find_existing_pulls(type, subreddits): #remove existing pulls from subreddit
     done = os.listdir(os.path.join('../../Files/', type))
     for i in done:
         done[done.index(i)] = i[:-7]
-    res = [i for i in subreddits if i not in done]
+    res = [i for i in subreddits if i in done]
     return res
 
 
