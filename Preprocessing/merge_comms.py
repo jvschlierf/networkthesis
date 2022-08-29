@@ -69,7 +69,7 @@ for comment in comments_open:
     if check == len(timestamps)- 1:
         print(f'passed length check for {comment}')
         submission = pd.read_pickle(f'../../Files/Submissions/score/{comment}.pickle')
-        df1 = pd.read_pickle(os.path.join('../../FilesComments/temp/', comment_files[0]))
+        df1 = pd.read_pickle(os.path.join('../../Files/Comments/temp/', comment_files[0]))
         if math.isclose(submission.created_utc.min(), df1.created_utc.min(), rel_tol=.0000023): # we require the first comment to be created within an hour of the first submission
             print(f'passed start check for {comment}')
             df2 = pd.read_pickle(os.path.join('../../FilesComments/temp/', comment_files[-1]))
