@@ -75,7 +75,7 @@ for comment in comments_open:
             df2 = pd.read_pickle(os.path.join('../../Files/Comments/temp/', comment_files[-1]))
             if math.isclose(submission.created_utc.max(), df2.created_utc.max(), rel_tol=0.0004): # we require the last comment to be created within 7 days of the last submission
                 print(f'passed end check for {comment}, merging now')
-                df = pd.concat([pd.read_pickle(candidate) for candidate in comment_files])
+                df = pd.concat([pd.read_pickle(os.path.join('../../Files/Comments/temp/', candidate)) for candidate in comment_files])
                 df.to_pickle(f'../../Files/Comments/{comment}.pickle')
                 print(f'{comment} merged')
 
