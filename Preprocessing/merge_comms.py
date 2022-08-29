@@ -70,7 +70,7 @@ for comment in comments_open:
         print(f'passed length check for {comment}')
         submission = pd.read_pickle(f'../../Files/Submissions/score/{comment}.pickle')
         df1 = pd.read_pickle(os.path.join('../../Files/Comments/temp/', comment_files[0]))
-        if math.isclose(submission.created_utc.min(), df1.created_utc.min(), rel_tol=.0000023): # we require the first comment to be created within an hour of the first submission
+        if math.isclose(submission.created_utc.min(), df1.created_utc.min(), rel_tol=0.0004): # we require the first comment to be within 7 days of the first submission
             print(f'passed start check for {comment}')
             df2 = pd.read_pickle(os.path.join('../../Files/Comments/temp/', comment_files[-1]))
             if math.isclose(submission.created_utc.max(), df2.created_utc.max(), rel_tol=0.0004): # we require the last comment to be created within 7 days of the last submission
