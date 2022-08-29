@@ -27,7 +27,7 @@ validp = pd.read_pickle('../../../Files/Submissions/train/val_split_submission_r
 validp['text'] = validp['cleanText']
 validp = validp[['text', 'label']]
 
-valid = pd.concat([validc, validp], axis=0).sample(40000, random_state=42).reset_index(drop=True)
+valid = pd.concat([validc, validp], axis=0).reset_index(drop=True)
 
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
 
@@ -59,8 +59,8 @@ training_args = TrainingArguments(
     load_best_model_at_end=True,
     output_dir = '../../../Files/models/ROBERTA_base/both3/',
     overwrite_output_dir=True,
-    num_train_epochs=10,
-    per_device_train_batch_size=8, 
+    num_train_epochs=20,
+    per_device_train_batch_size=16, 
     evaluation_strategy='epoch',
     logging_dir='../../../Files/logs/', 
     save_strategy = "epoch",
