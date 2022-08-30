@@ -25,10 +25,10 @@ args = parser.parse_args(sys.argv[1:])
 
 
 model_name = "cardiffnlp/twitter-roberta-base-sentiment"
-tokenizer = AutoTokenizer.from_pretrained(model_name, padding='max_length', truncation=True, max_length=512)
+tokenizer = AutoTokenizer.from_pretrained(model_name, max_length=500, padding=True, truncation=True,  add_special_tokens=True)
 model = AutoModelForSequenceClassification.from_pretrained(os.path.join('../../../Files/models/', args.model_dir))
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, device=1)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500)
 
 try: 
     files = os.listdir(os.path.join('../../../Files/', args.dir_path))
@@ -45,7 +45,7 @@ if len(files) == 1:
     test = pd.read_pickle(os.path.join('../../../Files/', args.dir_path))
     testlist = []
     for i,j in test.iterrows():
-        testlist.append(j[args.field][0:500])
+        testlist.append(j[args.field])
     #score each submisssion title
     results = classifier(testlist)
 
