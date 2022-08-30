@@ -28,7 +28,7 @@ model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name, max_length=500, padding=True, truncation=True,  add_special_tokens=True)
 model = AutoModelForSequenceClassification.from_pretrained(os.path.join('../../../Files/models/', args.model_dir))
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=1)
 
 try: 
     files = os.listdir(os.path.join('../../../Files/', args.dir_path))
@@ -38,6 +38,8 @@ try:
 except NotADirectoryError:
     files = [args.dir_path.split('/')[-1]]
 
+
+print(classifier.device)
 print(f"setup completed, scoring {len(files)} subreddits")
 
 
