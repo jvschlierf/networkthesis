@@ -75,5 +75,5 @@ else:
             test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
             test.at[i, 'conf_1'] = results[i]['score']
         
-        test.to_pickle(os.path.join('../../../Files/', args.output_dir, "d_",file))
+        test.to_pickle(os.path.join('../../../Files/', args.output_dir, ("d_"+file)))
         print(f"saved {file}")
