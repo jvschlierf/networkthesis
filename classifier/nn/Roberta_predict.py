@@ -23,12 +23,11 @@ parser.add_argument('field', type=str, help='Field of data to predict on')
 
 args = parser.parse_args(sys.argv[1:])
 
-
 model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name, max_length=500, padding=True, truncation=True,  add_special_tokens=True)
 model = AutoModelForSequenceClassification.from_pretrained(os.path.join('../../../Files/models/', args.model_dir))
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=1, batch_size=64)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=1, batch_size=256)
 
 try: 
     files = os.listdir(os.path.join('../../../Files/', args.dir_path))
@@ -48,7 +47,8 @@ if len(files) == 1:
     testlist = []
     for i,j in test.iterrows():
         testlist.append(j[args.field])
-    #score each submisssion title
+    
+    #score
     results = classifier(testlist)
 
     for i, j in test.iterrows():
@@ -65,12 +65,15 @@ else:
         test = pd.read_pickle(os.path.join('../../../Files/', args.dir_path, file))
         testlist = []
         for i,j in test.iterrows():
-            testlist.append(j[args.field][0:500])
+            testlist.append(j[args.field])
+        
         #score each submisssion title
+        print(f"scoring {file}, length: {len(testlist)}")
         results = classifier(testlist)
-
+        print("scored")
         for i, j in test.iterrows():
             test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
             test.at[i, 'conf_1'] = results[i]['score']
         
-        test.to_pickle(os.path.join('../../../Files/', args.output_dir, file))
+        test.to_pickle(os.path.join('../../../Files/', args.output_dir, "d_",file))
+        print(f"saved {file}")
