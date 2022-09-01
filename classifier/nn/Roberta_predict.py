@@ -28,7 +28,7 @@ model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name, max_length=500, padding=True, truncation=True,  add_special_tokens=True)
 model = AutoModelForSequenceClassification.from_pretrained(os.path.join('../../../Files/models/', args.model_dir))
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=args.device, batch_size=128)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=args.device, batch_size=256)
 
 try: 
     files = os.listdir(os.path.join('../../../Files/', args.dir_path))
@@ -75,7 +75,7 @@ else:
         print(f"scoring {file}, length: {len(testlist)}")
         results = classifier(testlist)
         print("scored")
-        for i, j in test.iterrows():
+        for i, j in tqdm(test.iterrows(), total=len(test)):
             test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
             test.at[i, 'conf_1'] = results[i]['score']
         
