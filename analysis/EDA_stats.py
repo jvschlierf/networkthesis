@@ -9,7 +9,7 @@ parser.add_argument('pred', choices=('True', 'False'), help='use predicition or 
 
 args = parser.parse_args(sys.argv[1:])
 
-if args.pred:
+if args.pred == 'True':
     dictiona = {}
     for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
         if filename.endswith('.pickle'):
@@ -20,7 +20,7 @@ if args.pred:
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_pro', 'posts_anti', 'posts_neutral', 'authors'])
 
-if not args.pred:
+else:
     print('arg works')
     dictiona = {}
     for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
