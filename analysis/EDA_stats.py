@@ -1,28 +1,38 @@
 import pandas as pd
 import os
+import sys
+import argparse as arg
+
+parser = arg.ArgumentParser()
+parser.add_argument('dir_path', type=str, help='directory or path file to predict')
+parser.add_argument('pred', type=bool, help='use predicition or not')
+
+args = parser.parse_args(sys.argv[1:])
+
+if args.pred:
+    dictiona = {}
+    for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
+        if filename.endswith('.pickle'):
+            df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
+            file = filename[2:-7]
+            print(f'tabulating {file}')
+            dictiona[file] = [len(df), len(df[df['pred_1'] == 0]), len(df[df['pred_1'] == 1]), len(df[df['pred_1'] == 2]), len(df['author'].unique())]
+    
+    df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_pro', 'posts_anti', 'posts_neutral', 'authors'])
+
+else:
+    dictiona = {}
+    for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
+        if filename.endswith('.pickle'):
+            df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
+            file = filename[2:-7]
+            print(f'tabulating {file}')
+            dictiona[file] = [len(df), len(df['author'].unique())]
+    
+    df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'authors'])
 
 
-length = {}
-post_pro = {}
-post_neut = {}
-post_anti = {}
-posters = {}
-
-for filename in os.listdir('../../Files/Submissions/score/done/'):
-    if filename.endswith('.pickle'):
-        df = pd.read_pickle('../../Files/Submissions/score/done/' + filename)
-        file = filename[2:-7]
-        print(f'tabulating {file}')
-        length[file] = len(df)
-        post_pro[file] = len(df[df['pred_1'] == 0])
-        post_neut[file] = len(df[df['pred_1'] == 1])
-        post_anti[file] = len(df[df['pred_1'] == 2])
-        posters[file] = len(df['author'].unique())
 
 
-df = pd.DataFrame.from_dict(length)
-df['post_pro'] = df.map(post_pro)
-df['post_neut'] = df.map(post_neut)
-df['post_anti'] = df.map(post_anti)
-df['posters'] = df.map(posters)
-df.to_csv('../../Files/Submissions/score/EDA_stats.csv')
+
+df.to_csv(os.path.join('../../Files/', args.dir_path, 'EDA_stats.csv'))
