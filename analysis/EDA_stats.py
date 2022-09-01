@@ -20,7 +20,7 @@ if args.pred:
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_pro', 'posts_anti', 'posts_neutral', 'authors'])
 
-else:
+if not args.pred:
     dictiona = {}
     for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
         if filename.endswith('.pickle'):
