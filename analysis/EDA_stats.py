@@ -26,7 +26,7 @@ else:
     for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
         if filename.endswith('.pickle'):
             df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
-            file = filename[2:-7]
+            file = filename[:-7]
             print(f'tabulating {file}')
             dictiona[file] = [len(df), len(df['author'].unique())]
     
