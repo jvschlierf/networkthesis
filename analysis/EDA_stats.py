@@ -10,7 +10,7 @@ posters = {}
 
 for filename in os.listdir('../../Files/Submissions/score/done/'):
     if filename.endswith('.pickle'):
-        df = pd.read_csv('../../Files/Submissions/score/done/' + filename)
+        df = pd.read_pickle('../../Files/Submissions/score/done/' + filename)
         file = filename[:-7]
         print(f'tabulating {file}')
         length[file] = len(df)
