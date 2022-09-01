@@ -52,10 +52,13 @@ if len(files) == 1:
     #score
     results = classifier(testlist)
 
-    for i, j in test.iterrows():
-        test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
-        test.at[i, 'conf_1'] = results[i]['score']
+    # for i, j in test.iterrows():
+    #     test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
+    #     test.at[i, 'conf_1'] = results[i]['score']
     
+    test['pred_1'] = [np.int64(x['label'][-1]) for x in results]
+    test['conf_1'] = [x['score'] for x in results]
+
     test.to_pickle(os.path.join('../../../Files/', args.output_dir))
 
 else:

@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     files =  [file for file in files if file.endswith('.pickle')]
 
-    files = ('ShitLiberalsSay.pickle', 'progressive.pickle', 'Qult_Headquarters.pickle')
+    files = ['myanmar.pickle']
     if args.ptype == 'Comments':
         for file in tqdm(files):
             df = pd.read_pickle(os.path.join('../../../Files/',dirs,file))
