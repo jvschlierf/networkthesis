@@ -11,7 +11,7 @@ posters = {}
 for filename in os.listdir('../../Files/Submissions/score/done/'):
     if filename.endswith('.pickle'):
         df = pd.read_pickle('../../Files/Submissions/score/done/' + filename)
-        file = filename[:-7]
+        file = filename[2:-7]
         print(f'tabulating {file}')
         length[file] = len(df)
         post_pro[file] = len(df[df['pred_1'] == 0])
