@@ -11,7 +11,7 @@ columns=['cleanText']
 
 df0 = pd.read_parquet('../../Files/Submissions/score/done/Anti_vac.parquet')
 print('loaded first file')
-df1 = pd.read_parquet('../../Files/Submissions/score/done/Neutr.parquet')
+df1 = pd.read_parquet('../../Files/Submissions/score/done/Neutr_vac.parquet')
 print('loaded second file')
 df2 = pd.read_parquet('../../Files/Submissions/score/done/Pro_vac.parquet')
 print('loaded third file, merging')
