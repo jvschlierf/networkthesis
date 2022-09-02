@@ -31,9 +31,9 @@ for file in tqdm(files):
     df1 = df[df['pred_1'] == 1.0]
     df2 = df[df['pred_1'] == 2.0]
 
-    Ant_Vac.append(df0, ignore_index=True)
-    Neutr.append(df1, ignore_index=True)
-    Pro_Vac.append(df2, ignore_index=True)
+    Ant_Vac = pd.concat([Ant_Vac, df0], ignore_index=True)
+    Neutr = pd.concat([Neutr, df1], ignore_index=True)
+    Pro_Vac = pd.concat([Pro_Vac, df2], ignore_index=True)
 
 print('done splitting, writing to file')
 Ant_Vac.to_parquet(os.path.join('../../Files/', args.dir_path, 'Anti_vac.parquet'))
