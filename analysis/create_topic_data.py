@@ -14,7 +14,7 @@ args = parser.parse_args(sys.argv[1:])
 files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
 
-Pro_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'num_comments', 'pred_1'])
+Pro_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'num_comments', 'pred_1',])
 Ant_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'num_comments', 'pred_1'])
 Neutr = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'num_comments', 'pred_1'])
 
@@ -25,7 +25,7 @@ for file in tqdm(files):
     df['cleanText'] = df['cleanText'].str.replace(r'\[\s', '[', regex=True)
     df['cleanText'] = df['cleanText'].str.replace(r'\s\]', ']', regex=True)
 
-    df['cleanText'] = df['cleanText'].str.split(expand=False)
+    # df['cleanText'] = df['cleanText'].str.split(expand=False)
 
     df0 = df[df['pred_1'] == 0.0]
     df1 = df[df['pred_1'] == 1.0]
@@ -36,6 +36,6 @@ for file in tqdm(files):
     Pro_Vac = pd.concat([Pro_Vac, df2], ignore_index=True)
 
 print('done splitting, writing to file')
-Ant_Vac.to_parquet(os.path.join('../../Files/', args.dir_path, 'Anti_vac.parquet'))
-Neutr.to_parquet(os.path.join('../../Files/', args.dir_path, 'Neutr_vac.parquet'))
-Pro_Vac.to_parquet(os.path.join('../../Files', args.dir_path, 'Pro_vac.parquet'))
+Ant_Vac.to_parquet(os.path.join('../../Files/', args.dir_path, 'Anti_vacc.parquet'))
+Neutr.to_parquet(os.path.join('../../Files/', args.dir_path, 'Neutr_vacc.parquet'))
+Pro_Vac.to_parquet(os.path.join('../../Files', args.dir_path, 'Pro_vacc.parquet'))
