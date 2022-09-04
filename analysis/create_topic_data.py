@@ -21,7 +21,7 @@ Neutr = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit', 'pred_1'])
 for file in tqdm(files):
     df = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
 
-    df = df[['cleanBody', 'score', 'subreddit', 'num_comments', 'pred_1']]
+    df = df[['cleanBody', 'score', 'subreddit', 'pred_1']]
     df['cleanBody'] = df['cleanBody'].str.replace(r'\[\s', '[', regex=True)
     df['cleanBody'] = df['cleanBody'].str.replace(r'\s\]', ']', regex=True)
 
