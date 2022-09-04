@@ -18,7 +18,7 @@ files = [file for file in files if file.endswith('.pickle')]
 filename = files.pop(0)
 df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
 df['date'] = pd.to_datetime([datetime.fromtimestamp(f) for f in df['created_utc']]).date
-df = df.groupby(['date', 'pred_1'], as_index=False).num_comments.count()
+df = df.groupby(['date', 'pred_1'], as_index=False).score.count()
 df = df.pivot(index='date',columns='pred_1')
 
 for file in tqdm(files):
