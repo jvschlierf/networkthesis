@@ -5,14 +5,14 @@ import numpy as np
 from datasets import Dataset, load_metric
 import pandas as pd
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-train = pd.read_csv('../../../Files/Submissions/train/train2.csv', sep='|')
+train = pd.read_csv('../../../Files/Submissions/train/train2_v2.csv', sep='|')
 train['text'] = train['cleanText']
 train = train[['text', 'label']]
 train_dataset = Dataset.from_pandas(train, preserve_index=False)
 
-valid = pd.read_csv('../../../Files/Submissions/train/test2.csv', sep='|')
+valid = pd.read_csv('../../../Files/Submissions/train/test2_v2.csv', sep='|')
 valid['text'] = valid['cleanText']
 valid = valid[['text', 'label']]
 valid_dataset = Dataset.from_pandas(valid, preserve_index=False)
@@ -43,7 +43,7 @@ def compute_metrics(eval_pred):
 
 training_args = TrainingArguments(
     load_best_model_at_end=True,
-    output_dir = '../../../Files/models/ROBERTA_base/Posts/Fully2/',
+    output_dir = '../../../Files/models/ROBERTA_base/Posts/Fully3/',
     overwrite_output_dir=True,
     num_train_epochs=5,
     per_device_train_batch_size=8, 
