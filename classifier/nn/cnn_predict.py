@@ -19,11 +19,12 @@ target = 'label'
 input_column = 'cleanText'
 
 
-
-label2int = pickle.read('../../../Files/cnnlabel2int.pickle')
-# inverted index to translate it back
-int2label = pickle.read('../../../Files/cnnint2label.pickle')
-word2int = pickle.read('../../../Files/cnnword2int.pickle')
+with open('../../../Files/models/cnnlabel2int.pickle', 'rb') as f:
+    label2int = pickle.load(f)
+with open('../../../Files/models/cnnint2label.pickle', 'rb') as f:
+    int2label = pickle.load(f)
+with open('../../../Files/models/cnnword2int.pickle', 'rb') as f:
+    word2int= pickle.load(f)
 
 def convert2ints(instances):
     """
