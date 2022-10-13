@@ -1,6 +1,6 @@
 import pandas as pd 
 from keras.utils import to_categorical
-from torch.nn.utils.rnn import pad_sequence
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 import os
 import pickle
 from tqdm import tqdm
@@ -12,8 +12,8 @@ from keras.layers import Dropout, Dense, Activation
 import numpy as np
 
 
-from tensorflow import keras
-model = keras.models.load_model('../../../Files/models/CNN8-64.h5')
+import tensorflow as tf
+model = tf.keras.models.load_model('../../../Files/models/CNN8-64')
 
 target = 'label'
 input_column = 'cleanText'
@@ -54,6 +54,7 @@ for file in tqdm(files):
     score = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
     score_instances = score[input_column].apply(str).apply(str.split)
     score_instances_int = convert2ints(score_instances)
+    score_instances_int = pad_sequences(score_instances_int, padding='post', maxlen=78)
     results = model.predict(score_instances_int)
     print(f'predicted for {len(results)} instances')
 
