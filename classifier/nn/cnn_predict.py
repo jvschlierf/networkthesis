@@ -13,7 +13,7 @@ import numpy as np
 
 
 import tensorflow as tf
-model = tf.keras.models.load_model('../../../Files/models/CNN8-64')
+model = tf.keras.models.load_model('../../../Files/models/CNN8-64.h5')
 
 target = 'label'
 input_column = 'cleanText'
@@ -39,7 +39,7 @@ def convert2ints(instances):
 
 
 
-files = os.listdir('../../../Files/Submissions/score/')
+files = ['shitposting.pickle']
 
 # remove any files that are not in the .pickle type 
 files = [f for f in files if f.endswith('.pickle')]
@@ -54,13 +54,14 @@ for file in tqdm(files):
     score = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
     score_instances = score[input_column].apply(str).apply(str.split)
     score_instances_int = convert2ints(score_instances)
-    score_instances_int = pad_sequences(score_instances_int, padding='post', maxlen=78)
+    score_instances_int = pad_sequences(score_instances_int, padding='post', maxlen=67)
     results = model.predict(score_instances_int)
     print(f'predicted for {len(results)} instances')
 
-    for i, j in score.iterrows():
-        score.at[i, 'class_I'] = np.argmax(results[i])
-        score.at[i, 'conf_I'] = results[i].max()
+    class_I = np.argmax(results, axis=1)
+    score['class_I'] = class_I
+    conf_I = results.max(axis=1)
+    score['class_I'] = class_I
 
     score.to_pickle(f'../../../Files/Submissions/score/{file}')
     covid_rel = score['class_I'] == 1
