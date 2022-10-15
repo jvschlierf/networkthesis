@@ -2,6 +2,7 @@
 import os
 import torch
 from transformers import  AutoTokenizer, AutoModelForSequenceClassification
+from datasets import Dataset
 import numpy as np
 import pandas as pd
 from transformers import TextClassificationPipeline
@@ -28,7 +29,7 @@ model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(model_name, max_length=500, padding=True, truncation=True,  add_special_tokens=True)
 model = AutoModelForSequenceClassification.from_pretrained(os.path.join('../../../Files/models/', args.model_dir))
 
-classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=args.device, batch_size=256)
+classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, truncation=True,  max_length=500, device=args.device, batch_size=128, return_all_scores=True)
 
 try: 
     files = os.listdir(os.path.join('../../../Files/', args.dir_path))
@@ -45,19 +46,16 @@ print(f"setup completed, scoring {len(files)} subreddits")
 
 if len(files) == 1:
     test = pd.read_pickle(os.path.join('../../../Files/', args.dir_path))
-    testlist = []
-    for i,j in test.iterrows():
-        testlist.append(j[args.field])
+
+    data = Dataset.from_pandas(test[[args.field]])
+
     
     #score
-    results = classifier(testlist)
+    results = classifier(data[args.field])
 
     for i, j in tqdm(test.iterrows(), total=len(test)):
         test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
         test.at[i, 'conf_1'] = results[i]['score']
-    
-    # test['pred_1'] = [np.int64(x['label'][-1]) for x in results]
-    # test['conf_1'] = [x['score'] for x in results]
 
     test.to_pickle(os.path.join('../../../Files/', args.output_dir))
 
@@ -67,17 +65,22 @@ else:
         print(file)
         
         test = pd.read_pickle(os.path.join('../../../Files/', args.dir_path, file))
-        testlist = []
-        for i,j in test.iterrows():
-            testlist.append(j[args.field])
+        data = Dataset.from_pandas(test[[args.field, 'num_comments']])
+
+    
+        #score
+        print(f"scoring {file}, length: {len(test)}")
+        results = classifier(data[args.field])
         
-        #score each submisssion title
-        print(f"scoring {file}, length: {len(testlist)}")
-        results = classifier(testlist)
+
         print("scored")
-        for i, j in tqdm(test.iterrows(), total=len(test)):
-            test.at[i, 'pred_1'] = np.int64(results[i]['label'][-1])
-            test.at[i, 'conf_1'] = results[i]['score']
-        
+        score_0 = [results[i][0]['score'] for i in range(len(results))]
+        score_1 = [results[i][1]['score'] for i in range(len(results))]
+        score_2 = [results[i][2]['score'] for i in range(len(results))]
+
+        test['label_0'] = score_0
+        test['label_1'] = score_1
+        test['label_2'] = score_2
+         
         test.to_pickle(os.path.join('../../../Files/', args.output_dir, ("d_"+file)))
         print(f"saved {file}")
