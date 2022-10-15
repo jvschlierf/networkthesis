@@ -54,7 +54,7 @@ for file in tqdm(files):
     score = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
     score_instances = score[input_column].apply(str).apply(str.split)
     score_instances_int = convert2ints(score_instances)
-    score_instances_int = pad_sequences(score_instances_int, padding='post', maxlen=67)
+    score_instances_int = pad_sequences(score_instances_int, padding='post', maxlen=78)
     results = model.predict(score_instances_int)
     print(f'predicted for {len(results)} instances')
 
