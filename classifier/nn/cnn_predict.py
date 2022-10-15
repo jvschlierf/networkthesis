@@ -13,7 +13,7 @@ import numpy as np
 
 
 import tensorflow as tf
-model = tf.keras.models.load_model('../../../Files/models/CNN8-64.h5')
+model = tf.keras.models.load_model('../../../Files/models/CNN8-64')
 
 target = 'label'
 input_column = 'cleanText'
