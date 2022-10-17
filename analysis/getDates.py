@@ -14,6 +14,7 @@ args = parser.parse_args(sys.argv[1:])
 
 files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
+files = [file for file in files if file.startswith('d_')]
 
 filename = files.pop(0)
 df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
