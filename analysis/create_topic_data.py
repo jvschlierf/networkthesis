@@ -27,9 +27,9 @@ for file in tqdm(files):
 
     # df['cleanBody'] = df['cleanBody'].str.split(expand=False)
 
-    df0 = df[df['pred_1'] == 0.0]
-    df1 = df[df['pred_1'] == 1.0]
-    df2 = df[df['pred_1'] == 2.0]
+    df0 = df[df['class_II'] == 0.0]
+    df1 = df[df['class_II'] == 1.0] 
+    df2 = df[df['class_II'] == 2.0]
 
     Ant_Vac = pd.concat([Ant_Vac, df0], ignore_index=True)
     Neutr = pd.concat([Neutr, df1], ignore_index=True)

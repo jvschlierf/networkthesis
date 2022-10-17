@@ -24,7 +24,7 @@ df = df.pivot(index='date',columns='pred_1')
 for file in tqdm(files):
     temp = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
     temp['date'] = pd.to_datetime([datetime.fromtimestamp(f) for f in temp['created_utc']]).date
-    temp = temp.groupby(['date', 'pred_1'], as_index=False).score.count()
+    temp = temp.groupby(['date', 'class_II'], as_index=False).score.count()
     temp = temp.pivot(index='date',columns='pred_1')
     df = df.add(temp,  fill_value=0)
 
