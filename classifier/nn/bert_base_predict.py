@@ -20,13 +20,13 @@ parser.add_argument('model_dir',type=str, help='directory of model files')
 parser.add_argument('output_dir', type=str, help='directory for output files')
 parser.add_argument('field', type=str, help='Field of data to predict on')
 
-model_name = 'bert-base-cased'
+model_name = 'cardiffnlp/twitter-roberta-base-sentiment'
 tokenizer = AutoTokenizer.from_pretrained(model_name, padding=True, truncation=True)
 model = AutoModelForSequenceClassification.from_pretrained('../../../Files/models/bert_base_cased_model/fully_trained_5/checkpoint-2158/')
 
 classifier = TextClassificationPipeline(model=model, tokenizer=tokenizer, batch_size = 25, device=1)
 
-files = os.listdir('../../../Files/Submissions/score/')
+files = os.listdir('../../../Files/Submissions/score/done')
 
 # remove any files that are not in the .pickle type 
 files = [f for f in files if f.endswith('.pickle')]
@@ -35,7 +35,7 @@ print(f"setup completed, scoring {len(files)} subreddits")
 
 for file in tqdm(files):
     print(file)
-    test = pd.read_pickle(f'../../../Files/Submissions/score/{file}')
+    test = pd.read_pickle(f'../../../Files/Submissions/score/done/{file}')
     testlist = []
     for i,j in test.iterrows():
         testlist.append(j['cleanTitle'][0:500])
