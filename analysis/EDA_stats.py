@@ -5,7 +5,7 @@ import argparse as arg
 
 parser = arg.ArgumentParser()
 parser.add_argument('dir_path', type=str, help='directory or path file to predict')
-parser.add_argument('pred', choices=('True', 'False'), help='use predicition or not')
+parser.add_argument('pred', choices=('True', 'False'), help='use prediction or not')
 
 args = parser.parse_args(sys.argv[1:])
 
@@ -16,7 +16,7 @@ if args.pred == 'True':
             df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
             file = filename[2:-7]
             print(f'tabulating {file}')
-            dictiona[file] = [len(df), len(df[df['pred_1'] == 0]), len(df[df['pred_1'] == 1]), len(df[df['pred_1'] == 2]), len(df['author'].unique())]
+            dictiona[file] = [len(df), len(df[df['class_II'] == 0]), len(df[df['class_II'] == 1]), len(df[df['class_II'] == 2]), len(df['author'].unique())]
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_pro', 'posts_anti', 'posts_neutral', 'authors'])
 
