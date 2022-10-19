@@ -17,9 +17,9 @@ if args.pred == 'C1':
     for file in files:
        
         df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,file))
-        filename = file[2:-7]
+        filename = file[0:-7]
         print(f'tabulating {filename}')
-        dictiona[file] = [len(df), len(df[df['class_I'] == 0]), len(df[df['class_I'] == 1]), len(df['author'].unique())]
+        dictiona[filename] = [len(df), len(df[df['class_I'] == 0]), len(df[df['class_I'] == 1]), len(df['author'].unique())]
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'Non-Covid', 'Covid', 'authors'])
 
@@ -32,7 +32,7 @@ if args.pred == 'C2':
         df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,file))
         filename = file[2:-7]
         print(f'tabulating {filename}')
-        dictiona[file] = [len(df), len(df[df['class_II'] == 0]), len(df[df['class_II'] == 1]), len(df[df['class_II'] == 2]), len(df['author'].unique())]
+        dictiona[filename] = [len(df), len(df[df['class_II'] == 0]), len(df[df['class_II'] == 1]), len(df[df['class_II'] == 2]), len(df['author'].unique())]
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_anti', 'posts_neutral', 'posts_pro', 'authors'])
 
