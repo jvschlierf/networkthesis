@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import sys
 import argparse as arg
+from tqdm import tqdm
 
 parser = arg.ArgumentParser()
 parser.add_argument('dir_path', type=str, help='directory or path file to predict')
@@ -14,11 +15,11 @@ files = [file for file in files if file.endswith('.pickle')]
 
 if args.pred == 'C1':
     dictiona = {}
-    for file in files:
+    for file in tqdm(files):
        
         df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,file))
         filename = file[0:-7]
-        print(f'tabulating {filename}')
+        # print(f'tabulating {filename}')
         dictiona[filename] = [len(df), len(df[df['class_I'] == 0]), len(df[df['class_I'] == 1]), len(df['author'].unique())]
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'Non-Covid', 'Covid', 'authors'])
@@ -27,16 +28,16 @@ if args.pred == 'C1':
 if args.pred == 'C2':
     files = [file for file in files if file.startswith('d_')]
     dictiona = {}
-    for file in files:
+    for file in tqdm(files):
        
         df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,file))
         filename = file[2:-7]
-        print(f'tabulating {filename}')
+        # print(f'tabulating {filename}')
         dictiona[filename] = [len(df), len(df[df['class_II'] == 0]), len(df[df['class_II'] == 1]), len(df[df['class_II'] == 2]), len(df['author'].unique())]
     
     df = pd.DataFrame.from_dict(dictiona, orient='index', columns=['posts', 'posts_anti', 'posts_neutral', 'posts_pro', 'authors'])
 
-else:
+elif args.pred == 'NOTHING':
     print('arg works')
     dictiona = {}
     for filename in os.listdir(os.path.join('../../Files/', args.dir_path)):
