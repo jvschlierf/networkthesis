@@ -22,7 +22,7 @@ Neutr = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'class_II'])
 for file in tqdm(files):
     df = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
 
-    df0 = df[df['class_I'] == 1.0]
+    df = df[df['class_I'] == 1.0]
 
     df = df[['cleanText', 'score', 'subreddit', 'class_II']]
     df['cleanText'] = df['cleanText'].str.replace(r'\[\s', '[', regex=True)
