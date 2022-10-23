@@ -24,7 +24,6 @@ df = sl.pivot(index='author',columns='class_II')
 for filename in tqdm(files):
     if filename.endswith('.pickle'):
         temp = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
-        s
         sl = temp.groupby(['author', 'class_II'], as_index=False).score.count()
         temp = sl.pivot(index='author',columns='class_II')
 
