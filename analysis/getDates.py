@@ -14,21 +14,21 @@ args = parser.parse_args(sys.argv[1:])
 
 files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
-files = [file for file in files if file.startswith('d_')]
+# files = [file for file in files if file.startswith('d_')]
 
 filename = files.pop(0)
 df = pd.read_pickle(os.path.join('../../Files/', args.dir_path ,filename))
 df['date'] = pd.to_datetime([datetime.fromtimestamp(f) for f in df['created_utc']]).date
-df = df.groupby(['date', 'class_II'], as_index=False).score.count()
-df = df.pivot(index='date',columns='class_II')
+df = df.groupby(['date', 'class_I'], as_index=False).score.count()
+df = df.pivot(index='date',columns='class_I')
 
 for file in tqdm(files):
     temp = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
     temp['date'] = pd.to_datetime([datetime.fromtimestamp(f) for f in temp['created_utc']]).date
-    temp = temp.groupby(['date', 'class_II'], as_index=False).score.count()
-    temp = temp.pivot(index='date',columns='class_II')
+    temp = temp.groupby(['date', 'class_I'], as_index=False).score.count()
+    temp = temp.pivot(index='date',columns='class_I')
     df = df.add(temp,  fill_value=0)
 
 print('done splitting, writing to file')
 
-df.to_csv(os.path.join('../../Files/', args.dir_path, 'date_db.csv'))
+df.to_csv(os.path.join('../../Files/', args.dir_path, 'date_c1_db.csv'))
