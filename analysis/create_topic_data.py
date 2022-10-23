@@ -13,15 +13,16 @@ args = parser.parse_args(sys.argv[1:])
 
 files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
+files = [file for file in files if file.startswith('d_')]
 
-Pro_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'pred_1',])
-Ant_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'pred_1'])
-Neutr = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit', 'pred_1'])
+Pro_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'class_II',])
+Ant_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'class_II'])
+Neutr = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit', 'class_II'])
 
 for file in tqdm(files):
     df = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
 
-    df = df[['cleanBody', 'score', 'subreddit', 'pred_1']]
+    df = df[['cleanBody', 'score', 'subreddit', 'class_II']]
     df['cleanBody'] = df['cleanBody'].str.replace(r'\[\s', '[', regex=True)
     df['cleanBody'] = df['cleanBody'].str.replace(r'\s\]', ']', regex=True)
 
