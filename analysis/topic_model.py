@@ -1,72 +1,115 @@
-import pandas as pd
-from gensim.models import LdaMulticore, TfidfModel, CoherenceModel
-from gensim.corpora import Dictionary
-from gensim.models.phrases import Phrases
-from tqdm import tqdm
-
-import time 
-import multiprocessing 
-
+# Import Spark NLP
+import datetime
+from sparknlp.base import *
+from sparknlp.annotator import *
+from sparknlp.pretrained import PretrainedPipeline
+import sparknlp
+from pyspark.sql import SparkSession
+from pyspark.ml import Pipeline
+from sparknlp.base.document_assembler import DocumentAssembler
+from sparknlp.base.finisher import Finisher
+from sparknlp.annotator.stop_words_cleaner import StopWordsCleaner
+from sparknlp.annotator.normalizer import Normalizer
+from sparknlp.annotator.token import Tokenizer
+from pyspark.ml.clustering import LDA
+from pyspark.ml.feature import CountVectorizer
 columns=['cleanText']
 
-df0 = pd.read_parquet('../../Files/Submissions/score/done/Anti_vac.parquet', columns=columns)
-print('loaded first file')
-df1 = pd.read_parquet('../../Files/Submissions/score/done/Neutr_vac.parquet', columns=columns)
-print('loaded second file')
-df2 = pd.read_parquet('../../Files/Submissions/score/done/Pro_vac.parquet', columns=columns)
-print('loaded third file, merging')
+spark = SparkSession.builder \
+    .appName("Spark NLP")\
+    .config("spark.driver.memory","32G")\
+    .config("spark.driver.maxResultSize", "2G") \
+    .config("spark.jars.packages", "com.johnsnowlabs.nlp:spark-nlp_2.12:4.1.0")\
+    .config("spark.kryoserializer.buffer.max", "1000M")\
+    .getOrCreate()
 
+NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc.parquet")
 
-df = pd.concat([df0, df1, df2], ignore_index=True)
-print('merged')
-instances = df['cleanText'].to_list()
-print('got instances')
+# remove stopwords
+document_assembler = DocumentAssembler() \
+    .setInputCol("cleanText") \
+    .setOutputCol("document") \
+    .setCleanupMode("disabled")
+# Split sentence to tokens(array)
+tokenizer = Tokenizer() \
+  .setInputCols(["document"]) \
+  .setOutputCol("token")
+# clean unwanted characters and garbage
+normalizer = Normalizer() \
+    .setInputCols(["token"]) \
+    .setOutputCol("normalized")
 
-phrases = Phrases(instances, min_count=5, threshold=1)
-print('got phrases')
-instances_colloc = phrases[instances]
-print('got instance collocs')
-dictionary = Dictionary(instances_colloc)
-# get rid of words that are too rare or too frequent
-dictionary.filter_extremes(no_below=50, no_above=0.3)
-print(dictionary, flush=True)
+stopwords_cleaner = StopWordsCleaner()\
+      .setInputCols("normalized") \
+      .setOutputCol("cleanTokens")\
+      .setCaseSensitive(False)
 
-#replace words by their numerical IDs and their frequency
-print("translating corpus to IDs", flush=True)
-ldacorpus = [dictionary.doc2bow(text) for text in instances]
-# learn TFIDF values from corpus
-print("tf-idf transformation", flush=True)
-tfidfmodel = TfidfModel(ldacorpus)
-# transform raw frequencies into TFIDF
-model_corpus = tfidfmodel[ldacorpus]
+finisher = Finisher() \
+    .setInputCols(["cleanTokens"]) \
+    .setOutputCols(["tokens"]) \
+    .setOutputAsArray(True) \
+    .setCleanAnnotations(False)
 
+nlp_pipeline = Pipeline(
+    stages=[
+        document_assembler,
+            tokenizer,
+            normalizer,
+            stopwords_cleaner,  
+            finisher])
 
-coherence_values = []
+# train the pipeline
+nlp_model = nlp_pipeline.fit(NeutralFile)
 
+# apply the pipeline to transform dataframe.
+processed_df  = nlp_model.transform(NeutralFile)
 
+tokens_df = processed_df.select('class_II','tokens')
+tokens_df.count()
 
-for num_topics in tqdm(range(4, 20)):
-    model = LdaMulticore(corpus=model_corpus, 
-                         id2word=dictionary, 
-                         num_topics=num_topics, random_state=42)
+cv = CountVectorizer(inputCol="tokens", outputCol="features", vocabSize=500, minDF=3.0)
+# train the model
+cv_model = cv.fit(tokens_df)
+# transform the data. Output column name will be features.
+vectorized_tokens = cv_model.transform(tokens_df)
 
-    coherencemodel_umass = CoherenceModel(model=model, 
-                                          texts=instances, 
-                                          dictionary=dictionary, 
-                                          coherence='u_mass')
+topic_range = [2,3,4,5,6,7,8]
 
-    coherencemodel_cv = CoherenceModel(model=model, 
-                                       texts=instances, 
-                                       dictionary=dictionary, 
-                                       coherence='c_v')
-
-    umass_score = coherencemodel_umass.get_coherence()
-    cv_score = coherencemodel_cv.get_coherence()
-    
-    print(num_topics, umass_score, cv_score)
-    coherence_values.append((num_topics, umass_score, cv_score))
-
-
-
-scores = pd.DataFrame(coherence_values, columns=['num_topics', 'UMass', 'CV'])
-scores.to_csv('../../Files/Submissions/score/done/topic_scores.csv')
+results = ''
+for topic_n in topic_range:
+    num_topics = topic_n
+    print(datetime.datetime.now(), f"Number of topics: {num_topics}")
+    lda = LDA(k=num_topics, maxIter=10)
+    model4 = lda.fit(vectorized_tokens)
+    ll = model4.logLikelihood(vectorized_tokens)
+    lp = model4.logPerplexity(vectorized_tokens)
+    results += "*"*25
+    results += "\n"
+    results += f"NEURTRAL VACCINES, NUMBER OF TOPICS: {num_topics}"
+    results += "*"*25
+    results += "\n"
+    results += ("The lower bound on the log likelihood of the entire corpus: " + str(ll))
+    results += "\n"
+    results +=("The upper bound on perplexity: " + str(lp))
+    results += "\n"
+    results += "\n"
+    vocab = cv_model.vocabulary
+    topics = model4.describeTopics(maxTermsPerTopic = 30)   
+    topics_rdd = topics.rdd
+    topics_words = topics_rdd\
+        .map(lambda row: row['termIndices'])\
+        .map(lambda idx_list: [vocab[idx] for idx in idx_list])\
+        .collect()
+    for idx, topic in enumerate(topics_words):
+        results += ("topic: {}".format(idx))
+        results += "\n"
+        results += ("*"*25)
+        results += "\n"
+        for word in topic:
+            results += word
+            results += "\n"
+            # results += ("*"*25)
+            # results += "\n"
+#write results to file
+with open("../../Files/models/topic_ne.txt", "w") as output:
+    output.write(results)
