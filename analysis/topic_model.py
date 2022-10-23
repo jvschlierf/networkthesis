@@ -24,6 +24,8 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc.parquet")
+sample_n = NeutralFile.sample(0.1)
+
 
 # remove stopwords
 document_assembler = DocumentAssembler() \
@@ -58,11 +60,12 @@ nlp_pipeline = Pipeline(
             stopwords_cleaner,  
             finisher])
 
+print('Setup Complete')
 # train the pipeline
-nlp_model = nlp_pipeline.fit(NeutralFile)
+nlp_model = nlp_pipeline.fit(sample_n)
 
 # apply the pipeline to transform dataframe.
-processed_df  = nlp_model.transform(NeutralFile)
+processed_df  = nlp_model.transform(sample_n)
 
 tokens_df = processed_df.select('class_II','tokens')
 tokens_df.count()
