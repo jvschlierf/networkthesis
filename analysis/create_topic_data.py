@@ -15,16 +15,16 @@ files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
 files = [file for file in files if file.startswith('d_')]
 
-Pro_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'class_II',])
-Ant_Vac = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit',  'class_II'])
-Neutr = pd.DataFrame(columns=['cleanBody', 'score', 'subreddit', 'class_II'])
+Pro_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'class_II',])
+Ant_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'class_II'])
+Neutr = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'class_II'])
 
 for file in tqdm(files):
     df = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
 
-    df = df[['cleanBody', 'score', 'subreddit', 'class_II']]
-    df['cleanBody'] = df['cleanBody'].str.replace(r'\[\s', '[', regex=True)
-    df['cleanBody'] = df['cleanBody'].str.replace(r'\s\]', ']', regex=True)
+    df = df[['cleanText', 'score', 'subreddit', 'class_II']]
+    df['cleanText'] = df['cleanText'].str.replace(r'\[\s', '[', regex=True)
+    df['cleanText'] = df['cleanText'].str.replace(r'\s\]', ']', regex=True)
 
     # df['cleanBody'] = df['cleanBody'].str.split(expand=False)
 
