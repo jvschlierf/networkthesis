@@ -15,16 +15,16 @@ files = os.listdir(os.path.join('../../Files/', args.dir_path))
 files = [file for file in files if file.endswith('.pickle')]
 files = [file for file in files if file.startswith('d_')]
 
-Pro_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'class_II',])
-Ant_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'class_II'])
-Neutr = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'class_II'])
+Pro_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'created_utc', 'class_II',])
+Ant_Vac = pd.DataFrame(columns=['cleanText', 'score', 'subreddit',  'created_utc',  'class_II'])
+Neutr = pd.DataFrame(columns=['cleanText', 'score', 'subreddit', 'created_utc',  'class_II'])
 
 for file in tqdm(files):
     df = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
     print(len(df))
     df = df[df['class_I'] == 1.0]
     print(len(df))
-    df = df[['cleanText', 'score', 'subreddit', 'class_II']]
+    df = df[['cleanText', 'score', 'subreddit', 'created_utc', 'class_II']]
     df['cleanText'] = df['cleanText'].str.replace(r'\[\s', '[', regex=True)
     df['cleanText'] = df['cleanText'].str.replace(r'\s\]', ']', regex=True)
 
@@ -39,6 +39,6 @@ for file in tqdm(files):
     Pro_Vac = pd.concat([Pro_Vac, df2], ignore_index=True)
 
 print('done splitting, writing to file')
-Ant_Vac.to_parquet(os.path.join('../../Files/', args.dir_path, 'Anti_vacc.parquet'))
-Neutr.to_parquet(os.path.join('../../Files/', args.dir_path, 'Neutr_vacc.parquet'))
-Pro_Vac.to_parquet(os.path.join('../../Files', args.dir_path, 'Pro_vacc.parquet'))
+Ant_Vac.to_parquet(os.path.join('../../Files/', args.dir_path, 'Anti_vacc_d.parquet'))
+Neutr.to_parquet(os.path.join('../../Files/', args.dir_path, 'Neutr_vacc_d.parquet'))
+Pro_Vac.to_parquet(os.path.join('../../Files', args.dir_path, 'Pro_vacc_d.parquet'))

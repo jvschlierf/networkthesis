@@ -23,8 +23,24 @@ spark = SparkSession.builder \
     .config("spark.kryoserializer.buffer.max", "1000M")\
     .getOrCreate()
 
-NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc.parquet")
-sample_n = NeutralFile.sample(0.1)
+NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc_d.parquet")
+ProFile = spark.read.parquet("../../Files/Submissions/score/done/Pro_vacc_d.parquet")
+AntiFile = spark.read.parquet("../../Files/Submissions/score/done/Anti_vacc_d.parquet")
+
+
+
+
+import functools
+def unionAll(dfs):
+    return functools.reduce(lambda df1, df2: df1.union(df2.select(df1.columns)), dfs)
+
+Total = unionAll([NeutralFile, ProFile, AntiFile])
+
+sample = Total.sampleBy("class_II", fractions={
+    0.0: 0.10,
+    1.0: 0.10,
+    2.0: 0.10
+}, seed=42)
 
 
 # remove stopwords
@@ -62,21 +78,21 @@ nlp_pipeline = Pipeline(
 
 print('Setup Complete')
 # train the pipeline
-nlp_model = nlp_pipeline.fit(sample_n)
+nlp_model = nlp_pipeline.fit(sample)
 
 # apply the pipeline to transform dataframe.
-processed_df  = nlp_model.transform(sample_n)
+processed_df  = nlp_model.transform(sample)
 
-tokens_df = processed_df.select('class_II','tokens')
+tokens_df = processed_df.select('class_II','subreddit', 'score', 'created_utc','tokens')
 tokens_df.count()
 
-cv = CountVectorizer(inputCol="tokens", outputCol="features", vocabSize=500, minDF=3.0)
+cv = CountVectorizer(inputCol="tokens", outputCol="features", vocabSize=1000, minDF=3.0)
 # train the model
 cv_model = cv.fit(tokens_df)
 # transform the data. Output column name will be features.
 vectorized_tokens = cv_model.transform(tokens_df)
 
-topic_range = [2,3,4,5,6,7,8]
+topic_range = [4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20]
 
 results = ''
 for topic_n in topic_range:
@@ -88,7 +104,7 @@ for topic_n in topic_range:
     lp = model4.logPerplexity(vectorized_tokens)
     results += "*"*25
     results += "\n"
-    results += f"NEURTRAL VACCINES, NUMBER OF TOPICS: {num_topics}"
+    results += f"Total, NUMBER OF TOPICS: {num_topics}"
     results += "*"*25
     results += "\n"
     results += ("The lower bound on the log likelihood of the entire corpus: " + str(ll))
@@ -114,5 +130,5 @@ for topic_n in topic_range:
             # results += ("*"*25)
             # results += "\n"
 #write results to file
-with open("../../Files/models/topic_ne.txt", "w") as output:
+with open("../../Files/models/topic_t.txt", "w") as output:
     output.write(results)
