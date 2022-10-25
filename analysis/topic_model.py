@@ -92,7 +92,7 @@ cv_model = cv.fit(tokens_df)
 # transform the data. Output column name will be features.
 vectorized_tokens = cv_model.transform(tokens_df)
 
-topic_range = [4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20]
+topic_range = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
 
 results = ''
 for topic_n in topic_range:
@@ -112,23 +112,6 @@ for topic_n in topic_range:
     results +=("The upper bound on perplexity: " + str(lp))
     results += "\n"
     results += "\n"
-    vocab = cv_model.vocabulary
-    topics = model4.describeTopics(maxTermsPerTopic = 30)   
-    topics_rdd = topics.rdd
-    topics_words = topics_rdd\
-        .map(lambda row: row['termIndices'])\
-        .map(lambda idx_list: [vocab[idx] for idx in idx_list])\
-        .collect()
-    for idx, topic in enumerate(topics_words):
-        results += ("topic: {}".format(idx))
-        results += "\n"
-        results += ("*"*25)
-        results += "\n"
-        for word in topic:
-            results += word
-            results += "\n"
-            # results += ("*"*25)
-            # results += "\n"
-#write results to file
-with open("../../Files/models/topic_t.txt", "w") as output:
+    
+with open("../../Files/models/topic_t_s.txt", "w") as output:
     output.write(results)
