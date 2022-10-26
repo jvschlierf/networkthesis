@@ -16,31 +16,20 @@ from pyspark.ml.feature import CountVectorizer
 columns=['cleanText']
 
 spark = SparkSession.builder \
-    .appName("Spark NLP")\
+    .appName("Spark NLP_num")\
     .config("spark.driver.memory","32G")\
     .config("spark.driver.maxResultSize", "2G") \
     .config("spark.jars.packages", "com.johnsnowlabs.nlp:spark-nlp_2.12:4.1.0")\
     .config("spark.kryoserializer.buffer.max", "1000M")\
     .getOrCreate()
 
-NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc_d.parquet")
-ProFile = spark.read.parquet("../../Files/Submissions/score/done/Pro_vacc_d.parquet")
+# NeutralFile = spark.read.parquet("../../Files/Submissions/score/done/Neutr_vacc_d.parquet")
+# ProFile = spark.read.parquet("../../Files/Submissions/score/done/Pro_vacc_d.parquet")
 AntiFile = spark.read.parquet("../../Files/Submissions/score/done/Anti_vacc_d.parquet")
 
 
 
 
-import functools
-def unionAll(dfs):
-    return functools.reduce(lambda df1, df2: df1.union(df2.select(df1.columns)), dfs)
-
-Total = unionAll([NeutralFile, ProFile, AntiFile])
-
-sample = Total.sampleBy("class_II", fractions={
-    0.0: 0.10,
-    1.0: 0.10,
-    2.0: 0.10
-}, seed=42)
 
 
 # remove stopwords
@@ -78,10 +67,10 @@ nlp_pipeline = Pipeline(
 
 print('Setup Complete')
 # train the pipeline
-nlp_model = nlp_pipeline.fit(sample)
+nlp_model = nlp_pipeline.fit(AntiFile)
 
 # apply the pipeline to transform dataframe.
-processed_df  = nlp_model.transform(sample)
+processed_df  = nlp_model.transform(AntiFile)
 
 tokens_df = processed_df.select('class_II','subreddit', 'score', 'created_utc','tokens')
 tokens_df.count()
@@ -92,7 +81,7 @@ cv_model = cv.fit(tokens_df)
 # transform the data. Output column name will be features.
 vectorized_tokens = cv_model.transform(tokens_df)
 
-topic_range = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+topic_range = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 results = ''
 for topic_n in topic_range:
@@ -113,5 +102,5 @@ for topic_n in topic_range:
     results += "\n"
     results += "\n"
     
-with open("../../Files/models/topic_t_s.txt", "w") as output:
+with open("../../Files/models/topic_a_s.txt", "w") as output:
     output.write(results)
