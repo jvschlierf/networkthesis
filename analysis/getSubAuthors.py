@@ -9,7 +9,7 @@ from tqdm import tqdm
 parser = arg.ArgumentParser()
 parser.add_argument('dir_path', type=str, help='directory or path file to predict')
 
-
+users = ['LordRaghuvnsi', 'SickestBiscuit', 'smallie-cheese-69', 'jessicarae28382', 'mdtau11', '-GreggRulzOk-', 'yasshost77', 'Bowser914', 'whosthetard', 'hanglestrangle']
 args = parser.parse_args(sys.argv[1:])
 
 files = os.listdir(os.path.join('../../Files/', args.dir_path))
@@ -22,14 +22,14 @@ df = df[df['class_I']== 1.0]
 
 df = df.groupby(['author', 'subreddit', 'class_II'], as_index=False).score.count()
 df = df.pivot(index='author',columns=['subreddit', 'class_II'])
-df = df[df['author']== 'whosthetard']
+df = df.loc[ df.index.isin(users), : ]
 for file in tqdm(files):
     temp = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
     temp = temp[temp['class_I']== 1.0]
     
     temp = temp.groupby(['author', 'subreddit','class_II'], as_index=False).score.count()
     temp = temp.pivot(index='author',columns=['subreddit', 'class_II'])
-    temp = temp[temp['author']== 'whosthetard']
+    temp = temp.loc[ temp.index.isin(users), : ]
     df = df.add(temp,  fill_value=0)
 
 print('done splitting, writing to file')
