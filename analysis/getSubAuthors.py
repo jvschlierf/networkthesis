@@ -22,13 +22,14 @@ df = df[df['class_I']== 1.0]
 
 df = df.groupby(['author', 'subreddit', 'class_II'], as_index=False).score.count()
 df = df.pivot(index='author',columns=['subreddit', 'class_II'])
-
+df = df[df['author']== 'whosthetard']
 for file in tqdm(files):
     temp = pd.read_pickle(os.path.join('../../Files', args.dir_path, file))
     temp = temp[temp['class_I']== 1.0]
     
     temp = temp.groupby(['author', 'subreddit','class_II'], as_index=False).score.count()
     temp = temp.pivot(index='author',columns=['subreddit', 'class_II'])
+    temp = temp[temp['author']== 'whosthetard']
     df = df.add(temp,  fill_value=0)
 
 print('done splitting, writing to file')
