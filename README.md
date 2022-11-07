@@ -1,2 +1,4 @@
 # networkthesis
 MSc. Thesis for the Program Data Science &amp; Business Analytics at Bocconi University
+
+This thesis aims at investigating the online discourse on Covid-19 vaccination in the US, downloading and analyzing posts from Reddit, a social media platform. We select a set of subreddits connected to Covid-19 vaccinations using a novel network-based approach and download these. We then train a two-layered classifier to predict the Covid-19 vaccine leaning of over 26 million posts. We analyze this scored data to understand where and when the conversation regarding vaccines occurred, and which topics it evolved around. We find that echo chambers are unlikely to exist for this discussion on Reddit and that the major topic of vaccine hesitancy is oppositions to governmental or other vaccine-mandates. ​
